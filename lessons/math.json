@@ -1,0 +1,50 @@
+{
+  "topic": "math",
+  "title": "math",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "Python does math like a calculator. + adds, - subtracts, * multiplies, / divides. / always gives a decimal, like 3.5.",
+      "task": "Print four sums and watch what comes back.",
+      "code": "print(2 + 3)\nprint(10 - 4)\nprint(6 * 7)\nprint(7 / 2)",
+      "say": "5, 6, 42, 3.5. See how 7 / 2 gave a decimal."
+    },
+    {
+      "lvl": 2,
+      "learn": "// divides and throws the decimal away. % gives what is left over. 7 // 2 is 3, and 7 % 2 is 1.",
+      "task": "Split 17 cookies between 5 people. Print how many each person gets, then how many are left.",
+      "code": "cookies = 17\nprint(cookies [[//]] 5)\nprint(cookies [[%]] 5)",
+      "say": "3 each, 2 left over. // is the share, % is the leftovers."
+    },
+    {
+      "lvl": 3,
+      "task": "Turn 135 minutes into hours and minutes.",
+      "code": "mins = 135\nprint(mins [[// 60]])\n[[print(mins % 60)]]",
+      "say": "2 hours and 15 minutes. That is // and % doing real work."
+    },
+    {
+      "lvl": 4,
+      "task": "Make days hold 23. Print how many full weeks that is. Then print how many days are left over.",
+      "hint": "Two prints. days // 7 gives the weeks. days % 7 gives the days left.",
+      "solution": "days = 23\nprint(days // 7)\nprint(days % 7)",
+      "checks": [
+        {
+          "kind": "out_is",
+          "text": "3\n2",
+          "msg": "I need two lines: 3, then 2."
+        },
+        {
+          "kind": "code_has",
+          "re": "//",
+          "msg": "Use // for the full weeks."
+        },
+        {
+          "kind": "code_has",
+          "re": "%",
+          "msg": "Use % for the days left over."
+        }
+      ],
+      "say": "3 weeks and 2 days. You split time with nothing to copy."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "topic": "variables",
+  "title": "variables",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "A variable is a name that holds a value. The = sign puts the value into the name. After that, you use the name instead of the value.",
+      "task": "Save your reason in a variable called goal. Then print goal.",
+      "code": "goal = \"<<reason>>\"\nprint(goal)",
+      "say": "Look at print(goal). No quotes. Without quotes, Python looks up the name and prints what it holds."
+    },
+    {
+      "lvl": 2,
+      "learn": "A variable can change. If you set it again, the newest value wins.",
+      "task": "Set mood to tired. Then set it to focused. Print it.",
+      "code": "mood = \"tired\"\n[[mood]] = \"focused\"\n[[print]](mood)",
+      "say": "focused. The second = replaced tired."
+    },
+    {
+      "lvl": 3,
+      "task": "Make tool hold hammer. Change it to drill. Print it.",
+      "code": "tool = [[\"hammer\"]]\n[[tool = \"drill\"]]\n[[print(tool)]]",
+      "say": "drill wins. Newest value, every time."
+    },
+    {
+      "lvl": 4,
+      "task": "Make a variable called name that holds your name. Then print it.",
+      "hint": "Two lines. name = \"...\" with your name in the quotes. Then print(name), with no quotes around name.",
+      "solution": "name = \"Sam\"\nprint(name)",
+      "checks": [
+        {
+          "kind": "code_has",
+          "re": "\\bname\\s*=",
+          "msg": "Make a variable called name first, with name = ..."
+        },
+        {
+          "kind": "code_has",
+          "re": "print\\s*\\(\\s*name\\s*\\)",
+          "msg": "Now print the variable itself: print(name), no quotes."
+        },
+        {
+          "kind": "min_lines",
+          "n": 1,
+          "msg": "Nothing printed yet."
+        }
+      ],
+      "say": "Hi, %out%. You just used a variable with nothing to copy from."
+    }
+  ]
+}

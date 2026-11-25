@@ -1,0 +1,24 @@
+# flow.py settings. One knob per setting. The server reads this file at start.
+# Paths are relative to this folder. To use a different file, set FLOWPY_CONFIG.
+
+server:
+  host: 127.0.0.1      # local only: the server runs the Python code you type
+  port: 8770
+
+lesson_writer:
+  provider: opencode-go
+  base_url: https://opencode.ai/zen/go/v1   # OpenAI-style chat API
+  api_key_var: OPENCODE_GO_API_KEY          # read from .env in this folder first, then the shell
+  model: deepseek-v4.1-flash                # default writer; press m on the home screen to pick any model
+  max_tokens: 16000
+  fix_attempts: 2      # extra tries when a written lesson fails its checks
+  request_timeout_seconds: 300   # one model call; lessons usually take well under a minute
+
+runner:
+  timeout_seconds: 5   # stops code that never ends (like an endless loop)
+  max_output_chars: 20000
+
+paths:
+  lessons_dir: lessons
+  data_dir: data
+  log_dir: logs

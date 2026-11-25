@@ -1,0 +1,50 @@
+{
+  "topic": "dicts",
+  "title": "dicts",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "A dict stores pairs. Each key points to a value, like a word and its meaning. You look up a value by putting its key in square brackets.",
+      "task": "Look up the price of a saw.",
+      "code": "prices = {\"hammer\": 12, \"saw\": 20}\nprint(prices[\"saw\"])",
+      "say": "20. You looked it up by its key."
+    },
+    {
+      "lvl": 2,
+      "learn": "Set a key with = to add a new pair, or to change one that is already there.",
+      "task": "Add a drill to the price list. Then look it up.",
+      "code": "prices = {\"hammer\": 12}\nprices[\"drill\"] [[=]] 40\nprint([[prices]][\"drill\"])",
+      "say": "40. New key, new pair."
+    },
+    {
+      "lvl": 3,
+      "task": "Ana is 30. Add one to her age. Print it.",
+      "code": "ages = {\"ana\": 30}\n[[ages[\"ana\"] = ages[\"ana\"] + 1]]\n[[print(ages[\"ana\"])]]",
+      "say": "31. Read the old value, add one, store it back."
+    },
+    {
+      "lvl": 4,
+      "task": "Make a dict called stock where apples is 5. Change apples to 8. Print the apples value.",
+      "hint": "stock = {\"apples\": 5}, then stock[\"apples\"] = 8, then print(stock[\"apples\"]).",
+      "solution": "stock = {\"apples\": 5}\nstock[\"apples\"] = 8\nprint(stock[\"apples\"])",
+      "checks": [
+        {
+          "kind": "out_is",
+          "text": "8",
+          "msg": "It should print 8."
+        },
+        {
+          "kind": "code_has",
+          "re": "\\bstock\\s*=\\s*\\{",
+          "msg": "Start with stock = { ... }."
+        },
+        {
+          "kind": "code_has",
+          "re": "stock\\[\\s*[\"']apples[\"']\\s*\\]\\s*=",
+          "msg": "Change it with stock[\"apples\"] = 8."
+        }
+      ],
+      "say": "8. Keys and values, from memory."
+    }
+  ]
+}

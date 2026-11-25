@@ -1,0 +1,47 @@
+{
+  "topic": "print",
+  "title": "print()",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "print() shows something on the screen. Text goes inside quotes. Python calls text in quotes a string.",
+      "task": "Finish the sentence with your real reason. Then run it.",
+      "code": "print(\"I want to learn Python so I can {{your reason|build my own tools}}\")",
+      "save": "reason",
+      "say": "\"%reason%.\" Good. Everything we build from here points at that."
+    },
+    {
+      "lvl": 2,
+      "learn": "Each print() makes its own line. Python runs your code from the top down.",
+      "task": "Print hello. Then print your name on the next line.",
+      "code": "print(\"hello\")\n[[print(]]\"{{your name|Sam}}\"[[)]]",
+      "save": "name",
+      "say": "Two print() calls, two lines. The gaps you just filled were print( and ). You knew them."
+    },
+    {
+      "lvl": 3,
+      "task": "Print three lines: ready, then set, then go.",
+      "code": "[[print]](\"ready\")\n[[print(\"set\")]]\n[[print(\"go\")]]",
+      "say": "Most of that came from memory. That is the whole trick."
+    },
+    {
+      "lvl": 4,
+      "task": "Print two lines. The first says hello. The second says anything you want.",
+      "hint": "Two print() lines. The first one is print(\"hello\").",
+      "solution": "print(\"hello\")\nprint(\"I did it\")",
+      "checks": [
+        {
+          "kind": "min_lines",
+          "n": 2,
+          "msg": "Close. I need two lines, and the first one has to be hello."
+        },
+        {
+          "kind": "first_line",
+          "text": "hello",
+          "msg": "Close. I need two lines, and the first one has to be hello."
+        }
+      ],
+      "say": "No ghost text, no gaps. You wrote that yourself."
+    }
+  ]
+}

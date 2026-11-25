@@ -1,0 +1,50 @@
+{
+  "topic": "lists",
+  "title": "lists",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "A list holds many values in order, inside square brackets. Every value has a spot number. Counting starts at 0, so the first value is at [0].",
+      "task": "Make a list of tools. Print the first one.",
+      "code": "tools = [\"hammer\", \"saw\", \"drill\"]\nprint(tools[0])",
+      "say": "hammer. Spot 0 is the first one."
+    },
+    {
+      "lvl": 2,
+      "learn": ".append() adds a value to the end of a list. len() tells you how many values the list has.",
+      "task": "Add a drill to the end. Print the list, then how long it is.",
+      "code": "tools = [\"hammer\", \"saw\"]\ntools.[[append]](\"drill\")\nprint(tools)\nprint([[len(tools)]])",
+      "say": "The drill landed at the end, and len() counted 3."
+    },
+    {
+      "lvl": 3,
+      "task": "Add 16 to the end of nums. Print the second number.",
+      "code": "nums = [4, 8, 15]\n[[nums.append(16)]]\n[[print(nums[1])]]",
+      "say": "8. Spot 1 is the second number, because counting starts at 0."
+    },
+    {
+      "lvl": 4,
+      "task": "Make a list called jobs with two jobs in it. Add a third job with append. Print how many jobs there are.",
+      "hint": "jobs = [\"cook\", \"clean\"], then jobs.append(\"code\"), then print(len(jobs)).",
+      "solution": "jobs = [\"cook\", \"clean\"]\njobs.append(\"code\")\nprint(len(jobs))",
+      "checks": [
+        {
+          "kind": "out_is",
+          "text": "3",
+          "msg": "I need it to print 3."
+        },
+        {
+          "kind": "code_has",
+          "re": "\\.append\\(",
+          "msg": "Add the third job with .append()."
+        },
+        {
+          "kind": "code_has",
+          "re": "\\blen\\(",
+          "msg": "Count them with len()."
+        }
+      ],
+      "say": "3. You built, grew and measured a list."
+    }
+  ]
+}

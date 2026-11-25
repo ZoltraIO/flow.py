@@ -1,0 +1,50 @@
+{
+  "topic": "f-strings",
+  "title": "f-strings",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "An f-string is a string with an f in front of the quotes. Inside it, a name in curly braces gets swapped for its value.",
+      "task": "Put your name in a variable. Then say hi to it with an f-string.",
+      "code": "name = \"<<name>>\"\nprint(f\"hi, {name}\")",
+      "say": "%out%. The {name} got swapped for what name holds."
+    },
+    {
+      "lvl": 2,
+      "learn": "You can put math inside the braces too. Python works out the answer first, then drops it in.",
+      "task": "You have 3 tools. Print that, then print how many you will have after you buy one more.",
+      "code": "tools = 3\nprint([[f]]\"I have {tools} tools\")\nprint(f\"next week: [[{tools + 1}]]\")",
+      "say": "3, then 4. The braces did the math for you."
+    },
+    {
+      "lvl": 3,
+      "task": "Make city hold Paris. Print I live in Paris, using an f-string.",
+      "code": "city = [[\"Paris\"]]\nprint([[f\"I live in {city}\"]])",
+      "say": "%out%. One f, one pair of braces."
+    },
+    {
+      "lvl": 4,
+      "task": "Make item hold drill and price hold 40. Print exactly: drill costs 40 dollars",
+      "hint": "item = \"drill\" and price = 40. Then print(f\"{item} costs {price} dollars\").",
+      "solution": "item = \"drill\"\nprice = 40\nprint(f\"{item} costs {price} dollars\")",
+      "checks": [
+        {
+          "kind": "out_is",
+          "text": "drill costs 40 dollars",
+          "msg": "I need exactly: drill costs 40 dollars"
+        },
+        {
+          "kind": "code_has",
+          "re": "\\bf[\"']",
+          "msg": "Use an f-string, with f right before the quote."
+        },
+        {
+          "kind": "code_has",
+          "re": "\\{\\s*price\\s*\\}",
+          "msg": "Let the braces fill in price for you."
+        }
+      ],
+      "say": "%out%. Two names, one sentence, zero gluing."
+    }
+  ]
+}

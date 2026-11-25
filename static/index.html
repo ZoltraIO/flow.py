@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>flow.py</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%23000%27/%3E%3Crect x=%274%27 y=%2711%27 width=%278%27 height=%272%27 fill=%27%23a8c7fa%27/%3E%3C/svg%3E">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+.CodeMirror{font-family:monospace;height:300px;color:#000;direction:ltr}.CodeMirror-lines{padding:4px 0}.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like{padding:0 4px}.CodeMirror-gutter-filler,.CodeMirror-scrollbar-filler{background-color:#fff}.CodeMirror-gutters{border-right:1px solid #ddd;background-color:#f7f7f7;white-space:nowrap}.CodeMirror-linenumber{padding:0 3px 0 5px;min-width:20px;text-align:right;color:#999;white-space:nowrap}.CodeMirror-guttermarker{color:#000}.CodeMirror-guttermarker-subtle{color:#999}.CodeMirror-cursor{border-left:1px solid #000;border-right:none;width:0}.CodeMirror div.CodeMirror-secondarycursor{border-left:1px solid silver}.cm-fat-cursor .CodeMirror-cursor{width:auto;border:0!important;background:#7e7}.cm-fat-cursor div.CodeMirror-cursors{z-index:1}.cm-fat-cursor .CodeMirror-line::selection,.cm-fat-cursor .CodeMirror-line>span::selection,.cm-fat-cursor .CodeMirror-line>span>span::selection{background:0 0}.cm-fat-cursor .CodeMirror-line::-moz-selection,.cm-fat-cursor .CodeMirror-line>span::-moz-selection,.cm-fat-cursor .CodeMirror-line>span>span::-moz-selection{background:0 0}.cm-fat-cursor{caret-color:transparent}@-moz-keyframes blink{50%{background-color:transparent}}@-webkit-keyframes blink{50%{background-color:transparent}}@keyframes blink{50%{background-color:transparent}}.cm-tab{display:inline-block;text-decoration:inherit}.CodeMirror-rulers{position:absolute;left:0;right:0;top:-50px;bottom:0;overflow:hidden}.CodeMirror-ruler{border-left:1px solid #ccc;top:0;bottom:0;position:absolute}.cm-s-default .cm-header{color:#00f}.cm-s-default .cm-quote{color:#090}.cm-negative{color:#d44}.cm-positive{color:#292}.cm-header,.cm-strong{font-weight:700}.cm-em{font-style:italic}.cm-link{text-decoration:underline}.cm-strikethrough{text-decoration:line-through}.cm-s-default .cm-keyword{color:#708}.cm-s-default .cm-atom{color:#219}.cm-s-default .cm-number{color:#164}.cm-s-default .cm-def{color:#00f}.cm-s-default .cm-variable-2{color:#05a}.cm-s-default .cm-type,.cm-s-default .cm-variable-3{color:#085}.cm-s-default .cm-comment{color:#a50}.cm-s-default .cm-string{color:#a11}.cm-s-default .cm-string-2{color:#f50}.cm-s-default .cm-meta{color:#555}.cm-s-default .cm-qualifier{color:#555}.cm-s-default .cm-builtin{color:#30a}.cm-s-default .cm-bracket{color:#997}.cm-s-default .cm-tag{color:#170}.cm-s-default .cm-attribute{color:#00c}.cm-s-default .cm-hr{color:#999}.cm-s-default .cm-link{color:#00c}.cm-s-default .cm-error{color:red}.cm-invalidchar{color:red}.CodeMirror-composing{border-bottom:2px solid}div.CodeMirror span.CodeMirror-matchingbracket{color:#0b0}div.CodeMirror span.CodeMirror-nonmatchingbracket{color:#a22}.CodeMirror-matchingtag{background:rgba(255,150,0,.3)}.CodeMirror-activeline-background{background:#e8f2ff}.CodeMirror{position:relative;overflow:hidden;background:#fff}.CodeMirror-scroll{overflow:scroll!important;margin-bottom:-50px;margin-right:-50px;padding-bottom:50px;height:100%;outline:0;position:relative;z-index:0}.CodeMirror-sizer{position:relative;border-right:50px solid transparent}.CodeMirror-gutter-filler,.CodeMirror-hscrollbar,.CodeMirror-scrollbar-filler,.CodeMirror-vscrollbar{position:absolute;z-index:6;display:none;outline:0}.CodeMirror-vscrollbar{right:0;top:0;overflow-x:hidden;overflow-y:scroll}.CodeMirror-hscrollbar{bottom:0;left:0;overflow-y:hidden;overflow-x:scroll}.CodeMirror-scrollbar-filler{right:0;bottom:0}.CodeMirror-gutter-filler{left:0;bottom:0}.CodeMirror-gutters{position:absolute;left:0;top:0;min-height:100%;z-index:3}.CodeMirror-gutter{white-space:normal;height:100%;display:inline-block;vertical-align:top;margin-bottom:-50px}.CodeMirror-gutter-wrapper{position:absolute;z-index:4;background:0 0!important;border:none!important}.CodeMirror-gutter-background{position:absolute;top:0;bottom:0;z-index:4}.CodeMirror-gutter-elt{position:absolute;cursor:default;z-index:4}.CodeMirror-gutter-wrapper ::selection{background-color:transparent}.CodeMirror-gutter-wrapper ::-moz-selection{background-color:transparent}.CodeMirror-lines{cursor:text;min-height:1px}.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like{-moz-border-radius:0;-webkit-border-radius:0;border-radius:0;border-width:0;background:0 0;font-family:inherit;font-size:inherit;margin:0;white-space:pre;word-wrap:normal;line-height:inherit;color:inherit;z-index:2;position:relative;overflow:visible;-webkit-tap-highlight-color:transparent;-webkit-font-variant-ligatures:contextual;font-variant-ligatures:contextual}.CodeMirror-wrap pre.CodeMirror-line,.CodeMirror-wrap pre.CodeMirror-line-like{word-wrap:break-word;white-space:pre-wrap;word-break:normal}.CodeMirror-linebackground{position:absolute;left:0;right:0;top:0;bottom:0;z-index:0}.CodeMirror-linewidget{position:relative;z-index:2;padding:.1px}.CodeMirror-rtl pre{direction:rtl}.CodeMirror-code{outline:0}.CodeMirror-gutter,.CodeMirror-gutters,.CodeMirror-linenumber,.CodeMirror-scroll,.CodeMirror-sizer{-moz-box-sizing:content-box;box-sizing:content-box}.CodeMirror-measure{position:absolute;width:100%;height:0;overflow:hidden;visibility:hidden}.CodeMirror-cursor{position:absolute;pointer-events:none}.CodeMirror-measure pre{position:static}div.CodeMirror-cursors{visibility:hidden;position:relative;z-index:3}div.CodeMirror-dragcursors{visibility:visible}.CodeMirror-focused div.CodeMirror-cursors{visibility:visible}.CodeMirror-selected{background:#d9d9d9}.CodeMirror-focused .CodeMirror-selected{background:#d7d4f0}.CodeMirror-crosshair{cursor:crosshair}.CodeMirror-line::selection,.CodeMirror-line>span::selection,.CodeMirror-line>span>span::selection{background:#d7d4f0}.CodeMirror-line::-moz-selection,.CodeMirror-line>span::-moz-selection,.CodeMirror-line>span>span::-moz-selection{background:#d7d4f0}.cm-searching{background-color:#ffa;background-color:rgba(255,255,0,.4)}.cm-force-border{padding-right:.1px}@media print{.CodeMirror div.CodeMirror-cursors{visibility:hidden}}.cm-tab-wrap-hack:after{content:''}span.CodeMirror-selectedtext{background:0 0}
+
+</style>
+<style>
+body{margin:0}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<style>
+/* One quiet column on black. You type everything; nothing needs a mouse. */
+:root{
+  --bg:#000; --surface:#0a0a0c; --line:#1a1a1f;
+  --ghost:#4d4d56; --dim:#74747e; --fg:#ececef;
+  --accent:#a8c7fa; --bad:#e8696e;
+  --kw:#c4a8ff; --st:#a3d9a5; --nu:#f2c47e; --fn:#8fd0ff; --op:#9a9aa4;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--mono);-webkit-font-smoothing:antialiased}
+#app{min-height:100%;display:flex;flex-direction:column;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:22px;max-width:880px;width:100%;margin:0 auto;font-size:13px;color:var(--dim)}
+.logo{font-size:17px;color:var(--fg);font-weight:500;letter-spacing:-.01em}
+.logo b{color:var(--accent);font-weight:500}
+.logo i{font-style:normal;color:var(--dim)}
+.prog{display:flex;align-items:center;gap:12px}
+.dots{display:flex;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line);border:0;padding:0;cursor:pointer}
+.dot.done{background:var(--accent)}
+.dot.now{background:transparent;box-shadow:inset 0 0 0 1.5px var(--fg)}
+.meta{display:flex;align-items:center;gap:16px;font-variant-numeric:tabular-nums}
+.py{display:flex;align-items:center;gap:6px}
+.py::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dim)}
+.py[data-s="ready"]::before{background:var(--st)}
+.py[data-s="failed"]::before{background:var(--bad)}
+.py[data-s="loading"]::before{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+main{flex:1 1 auto;width:100%;max-width:880px;margin:0 auto;display:flex;flex-direction:column;justify-content:center;padding-block:24px 40px;min-width:0}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:lowercase;color:var(--dim);margin-bottom:34px;display:flex;gap:10px;flex-wrap:wrap}
+.eyebrow span+span::before{content:"·";margin-right:10px;color:var(--ghost)}
+.blocks{display:flex;flex-direction:column;gap:30px}
+.block{display:flex;flex-direction:column;gap:10px;transition:opacity .25s ease;min-width:0}
+.block .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ghost)}
+.block.next{opacity:.38}
+.block.past{opacity:.5}
+.block.past .lab,.block.next .lab{color:var(--ghost)}
+.block.active .lab{color:var(--dim)}
+
+.tx{position:relative;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}
+.prose .tx{font-size:clamp(17px,2.4vw,22px);line-height:1.62}
+.code .tx{font-size:clamp(15px,2vw,19px);line-height:1.75;white-space:pre;overflow-wrap:normal}
+.code .pane{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 22px;overflow-x:auto}
+.ch.ghost{color:var(--ghost)}
+.ch.blank{color:var(--ghost);opacity:.75}
+.ch.ok{color:var(--fg)}
+.ch.rec{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--accent) 45%,transparent);text-underline-offset:5px;text-decoration-thickness:1px}
+.ch.bad{color:var(--bad);text-decoration:underline;text-underline-offset:5px}
+.ch.nl{font-size:.7em;opacity:.55}
+.ch.nl.ok{opacity:0}
+.ch.free{color:var(--ghost);font-style:italic}
+.ch.free.has{color:var(--fg);font-style:normal;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--accent) 45%,transparent);text-underline-offset:5px}
+.t-kw.ok{color:var(--kw)}.t-st.ok,.t-st.free.has{color:var(--st)}.t-nu.ok{color:var(--nu)}.t-fn.ok{color:var(--fn)}.t-op.ok,.t-pu.ok{color:var(--op)}.t-cm.ok{color:var(--dim)}
+.caret{position:absolute;left:0;top:0;width:2px;background:var(--accent);border-radius:1px;transition:left .07s linear,top .07s linear;pointer-events:none}
+.caret.idle{animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.shake{animation:shake .18s linear}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+
+.cue{font-size:13px;color:var(--dim);display:flex;gap:8px;align-items:center;min-height:20px}
+.cue kbd,.keys kbd{font-family:var(--mono);font-size:12px;color:var(--fg);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:var(--surface)}
+.out{display:flex;flex-direction:column;gap:2px;font-size:16px;line-height:1.6;padding-left:2px}
+.out .o{white-space:pre-wrap;overflow-wrap:anywhere}
+.out .o::before{content:"› ";color:var(--ghost)}
+.out .e{color:var(--bad)}
+.say{font-size:clamp(15px,1.9vw,17px);line-height:1.6;color:var(--accent);max-width:64ch}
+.say.dimmer{color:var(--dim)}
+.res{display:flex;gap:36px;flex-wrap:wrap;margin-top:6px;font-variant-numeric:tabular-nums}
+.res div{display:flex;flex-direction:column;gap:2px}
+.res small{font-size:12px;color:var(--dim)}
+.res b{font-size:30px;font-weight:400;color:var(--accent)}
+.res b.plain{color:var(--fg)}
+.rise{animation:rise .3s ease-out both}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+
+.edwrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.edwrap.on{border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+.CodeMirror.cm-s-flow{height:auto;min-height:150px;background:transparent;color:var(--fg);font-family:var(--mono);font-size:clamp(15px,2vw,19px);line-height:1.75;padding:12px 8px}
+.cm-s-flow .CodeMirror-gutters{background:transparent;border:0}
+.cm-s-flow .CodeMirror-linenumber{color:var(--ghost)}
+.cm-s-flow .CodeMirror-cursor{border-left:2px solid var(--accent)}
+.cm-s-flow .CodeMirror-selected,.cm-s-flow.CodeMirror-focused .CodeMirror-selected{background:#1d2433}
+.cm-s-flow .cm-keyword{color:var(--kw)}.cm-s-flow .cm-string{color:var(--st)}.cm-s-flow .cm-number{color:var(--nu)}
+.cm-s-flow .cm-builtin{color:var(--fn)}.cm-s-flow .cm-variable,.cm-s-flow .cm-def{color:var(--fg)}
+.cm-s-flow .cm-operator,.cm-s-flow .cm-punctuation{color:var(--op)}.cm-s-flow .cm-comment{color:var(--dim)}
+.cm-s-flow .CodeMirror-matchingbracket{color:var(--fg)!important;text-decoration:underline}
+.cm-s-flow .CodeMirror-placeholder{color:var(--ghost)}
+.cm-s-flow .err-line{background:color-mix(in srgb,var(--bad) 12%,transparent)}
+
+.keys{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;padding-block:18px 24px;font-size:12px;color:var(--ghost)}
+.keys span{display:flex;align-items:center;gap:7px}
+.end h1{font-size:clamp(28px,5vw,44px);font-weight:400;margin:0 0 10px;letter-spacing:-.02em}
+.end p{color:var(--dim);margin:0 0 30px;font-size:16px;line-height:1.6;max-width:60ch}
+
+.choices{display:flex;flex-direction:column;gap:10px;max-width:560px}
+.choice{display:flex;gap:16px;align-items:flex-start;padding:16px 18px;border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:border-color .15s ease,background .15s ease}
+.choice.on{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:var(--surface)}
+.choice kbd{font-family:var(--mono);font-size:13px;color:var(--fg);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 7px;background:var(--surface)}
+.choice div{display:flex;flex-direction:column;gap:4px}
+.choice b{font-weight:500;font-size:17px}
+.choice small{color:var(--dim);font-size:13px;line-height:1.5}
+.why{color:var(--fg)!important;font-size:17px!important}
+.goal-in{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;color:var(--fg);font:inherit;font-family:var(--mono);font-size:17px;outline:none}
+.goal-in:focus{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.writer-note{margin-top:26px;color:var(--ghost);font-size:13px;font-family:var(--mono)}
+.writer-note kbd{font-family:var(--mono);font-size:12px;color:var(--fg);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 6px;background:var(--surface)}
+.wmlist{display:flex;flex-direction:column;gap:2px;max-width:560px;max-height:min(56vh,520px);overflow-y:auto;padding:2px}
+.wmrow{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;border:1px solid transparent;border-radius:8px;font-family:var(--mono);font-size:14px;color:var(--dim);cursor:pointer}
+.wmrow.on{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:var(--surface);color:var(--fg)}
+.wmrow small{color:var(--ghost);font-size:12px}
+.qbar{height:2px;background:var(--line);border-radius:1px;margin:-18px 0 30px;overflow:hidden}
+.qbar i{display:block;height:100%;background:var(--accent);transition:width .3s ease}
+.qtask{margin:0 0 6px;font-size:clamp(16px,2.2vw,20px);line-height:1.55;color:var(--fg)}
+.ansrow{display:flex;align-items:center;gap:12px;margin-top:6px;font-size:clamp(16px,2.2vw,20px)}
+.ansrow span{color:var(--ghost)}
+.ans{flex:1;min-width:0;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--fg);font:inherit;font-family:var(--mono);padding:8px 0;caret-color:var(--accent);outline:none}
+.ans:focus{border-bottom-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
+.ans::placeholder{color:var(--ghost)}
+.ans:disabled{color:var(--dim)}
+.shown{font-weight:500;color:var(--fg)}
+.map{display:flex;flex-direction:column;gap:2px;margin:6px 0 24px;max-width:420px}
+.mrow{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:12px;padding:5px 0;font-size:15px;color:var(--dim)}
+.mrow i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.mrow small{font-size:12px;color:var(--ghost)}
+.mrow.known{color:var(--fg)}.mrow.known i{background:var(--accent)}
+.mrow.learn i{box-shadow:inset 0 0 0 1.5px var(--dim);background:transparent}
+.mrow.gap{color:var(--fg)}.mrow.gap i{box-shadow:inset 0 0 0 1.5px var(--accent);background:transparent}.mrow.gap small{color:var(--accent)}
+.note{font-size:13px!important;color:var(--ghost)!important}
+.breathe{animation:breathe 2.4s ease-in-out infinite}@keyframes breathe{50%{opacity:.45}}
+.veil{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);color:var(--fg);font-size:15px;z-index:5;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.caret{transition:none}.caret.idle,.rise,.shake,.py::before,.breathe{animation:none}}
+</style>
+
+<div id="app">
+  <header class="top">
+    <div class="logo">flow<b>.</b><i>py</i></div>
+    <div class="prog"><span id="lname"></span><div class="dots" id="dots"></div></div>
+    <div class="meta"><span id="xp">0 xp</span><span class="py" id="py" data-s="loading">python</span></div>
+  </header>
+  <main id="stage" aria-live="polite"></main>
+  <footer class="keys" id="keys"></footer>
+</div>
+<div class="veil" id="veil" hidden>click anywhere, then keep typing</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/placeholder.min.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ---------- logging: every failure lands in console + window.__flowpyLog ---------- */
+const LOG = []; window.__flowpyLog = LOG;
+function log(level, msg, extra) {
+  LOG.push({ t: new Date().toISOString(), level, msg, extra });
+  (level === 'error' ? console.error : console.log)('[flowpy]', msg, extra ?? '');
+  if (level === 'error' || level === 'warn' || level === 'event')
+    fetch('/api/log', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Flowpy': '1' },
+      body: JSON.stringify({ level, msg, extra }) }).catch(() => {});
+}
+window.addEventListener('error', e => log('error', 'page error', e.message));
+window.addEventListener('unhandledrejection', e => log('error', 'unhandled promise', String(e.reason && e.reason.message || e.reason)));
+
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v; else if (k === 'text') el.textContent = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v); else el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  return el;
+}
+const $ = id => document.getElementById(id);
+const kbd = t => h('kbd', { text: t });
+
+/* ---------- the server: runs Python, saves progress, writes lessons ---------- */
+async function api(method, path, body) {
+  const headers = { 'X-Flowpy': '1' };
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  const r = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+  let data = null; try { data = await r.json(); } catch {}
+  if (!r.ok) { const e = new Error((data && (data.message || data.error)) || 'HTTP ' + r.status); e.status = r.status; e.data = data; throw e; }
+  return data;
+}
+const pyState = { status: 'loading', writer: null };
+const health = api('GET', '/api/health')
+  .then(hl => { pyState.status = 'ready'; pyState.writer = hl.writer; return hl; })
+  .catch(e => { pyState.status = 'failed'; log('error', 'server unreachable', e.message); return null; })
+  .finally(() => { const el = $('py'); el.dataset.s = pyState.status; el.textContent = pyState.status === 'failed' ? 'offline' : 'python'; });
+async function runPy(code) {
+  try { return await api('POST', '/api/run', { code }); }
+  catch (e) { log('error', 'run failed', e.message); return { ok: false, offline: true, out: '', err: 'The flow.py server is not answering.', line: null }; }
+}
+
+/* ---------- tiny Python highlighter for the typed code ---------- */
+const KW = new Set('False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield'.split(' '));
+const BI = new Set('print len range input str int float list dict type sum min max sorted abs round'.split(' '));
+function tokenize(src) {
+  const cls = new Array(src.length).fill(''); let i = 0;
+  while (i < src.length) {
+    const c = src[i];
+    if (c === '#') { while (i < src.length && src[i] !== '\n') cls[i++] = 'cm'; continue; }
+    if (c === '"' || c === "'") { let j = i + 1; while (j < src.length && src[j] !== c && src[j] !== '\n') j++; for (let k = i; k <= Math.min(j, src.length - 1); k++) cls[k] = 'st'; i = j + 1; continue; }
+    if (/[0-9]/.test(c)) { while (i < src.length && /[0-9._]/.test(src[i])) cls[i++] = 'nu'; continue; }
+    if (/[A-Za-z_]/.test(c)) {
+      let j = i; while (j < src.length && /\w/.test(src[j])) j++;
+      const w = src.slice(i, j); let n = j; while (src[n] === ' ') n++;
+      const t = KW.has(w) ? 'kw' : (BI.has(w) || src[n] === '(') ? 'fn' : 'id';
+      for (let k = i; k < j; k++) cls[k] = t; i = j; continue;
+    }
+    cls[i] = '()[]{}'.includes(c) ? 'pu' : '=+-*/<>%!:,.'.includes(c) ? 'op' : ''; i++;
+  }
+  return cls;
+}
+
+/* ---------- segments: plain text = shown, [[x]] = hidden (type from memory), {{label}} = your own words ---------- */
+function P(str, prof) {
+  const segs = [], re = /\[\[([\s\S]*?)\]\]|\{\{([\s\S]*?)\}\}|<<(reason|name)>>/g; let last = 0, m;
+  while ((m = re.exec(str))) {
+    if (m.index > last) segs.push({ t: 'g', s: str.slice(last, m.index) });
+    if (m[1] != null) segs.push({ t: 'b', s: m[1] });
+    else if (m[2] != null) segs.push({ t: 'f', ph: m[2].split('|')[0].trim() });
+    else { const v = prof && prof[m[3]]; segs.push(v ? { t: 'g', s: v } : { t: 'f', ph: 'your ' + m[3], save: m[3] }); }
+    last = re.lastIndex;
+  }
+  if (last < str.length) segs.push({ t: 'g', s: str.slice(last) });
+  return segs;
+}
+const G = s => [{ t: 'g', s }];
+const F = ph => [{ t: 'f', ph }];
+
+/* ---------- the typer: monkeytype-style, one block of text or code ---------- */
+function Typer(host, segs, opt) {
+  const cells = [];
+  for (const sg of segs) {
+    if (sg.t === 'f') cells.push({ k: 'f', ph: sg.ph, val: '', save: sg.save });
+    else for (const ch of sg.s) cells.push({ k: sg.t, ch });
+  }
+  const toks = opt.code ? tokenize(cells.map(c => c.k === 'f' ? 'x' : c.ch).join('')) : null;
+  const typed = new Array(cells.length), auto = new Array(cells.length).fill(false);
+  // auto-close: typing an opener fills in its partner, like an editor. You can type over it or skip past it.
+  const pair = {}, pend = new Array(cells.length).fill(false);
+  {
+    const stack = [], quotes = opt.code ? '"\'' : '"';
+    for (let i = 0; i < cells.length; i++) {
+      const ch = cells[i].ch; if (ch == null) continue;
+      if ('([{'.includes(ch)) stack.push(i);
+      else if (')]}'.includes(ch)) { const o = stack.pop(); if (o != null) pair[o] = i; }
+      else if (quotes.includes(ch)) {
+        let j = i + 1; while (j < cells.length && cells[j].ch !== ch && cells[j].ch !== '\n') j++;
+        if (j < cells.length && cells[j].ch === ch) { pair[i] = j; i = j; }
+      }
+    }
+  }
+  let pos = 0, done = false, idleT = 0;
+  const tx = h('div', { class: 'tx' }), caret = h('span', { class: 'caret idle', hidden: '' });
+  const spans = cells.map((c, i) => {
+    const s = h('span', { class: 'ch' });
+    tx.append(s);
+    if (c.ch === '\n') tx.append('\n');
+    return s;
+  });
+  const endSpan = h('span', { class: 'ch' }, '​'); tx.append(endSpan, caret);
+  host.append(tx);
+
+  function vis(t) { return t === '\n' ? '↵' : t === ' ' ? '·' : t; }
+  function paint(i) {
+    const c = cells[i], s = spans[i], tk = toks ? ' t-' + toks[i] : '';
+    if (c.k === 'f') { s.className = 'ch free' + (c.val ? ' has' : '') + tk; s.textContent = c.val || c.ph; return; }
+    const t = typed[i], nl = c.ch === '\n' ? ' nl' : '';
+    if (t === undefined && pend[i]) { s.className = 'ch ok auto' + tk; s.textContent = c.ch; }
+    else if (t === undefined) { s.className = 'ch ' + (c.k === 'b' ? 'blank' : 'ghost') + nl; s.textContent = c.k === 'b' ? (c.ch === '\n' ? '↵' : '_') : (c.ch === '\n' ? '↵' : c.ch); }
+    else if (t === c.ch) { s.className = 'ch ok' + tk + (c.k === 'b' ? ' rec' : '') + nl; s.textContent = c.ch === '\n' ? '↵' : c.ch; }
+    else { s.className = 'ch bad'; s.textContent = (c.k === 'b' || c.ch === ' ' || c.ch === '\n') ? vis(t) : c.ch; }
+  }
+  function place() {
+    if (done || !api.active) { caret.hidden = true; return; }
+    caret.hidden = false;
+    const c = cells[pos], target = pos < cells.length ? spans[pos] : endSpan;
+    const w = tx.getBoundingClientRect();
+    const rects = target.getClientRects(); const r = (c && c.k === 'f' && c.val) ? rects[rects.length - 1] : rects[0];
+    if (!r) return;
+    const x = (c && c.k === 'f' && c.val) ? r.right : r.left;
+    caret.style.left = (x - w.left + tx.scrollLeft) + 'px';
+    caret.style.top = (r.top - w.top + r.height * 0.12) + 'px';
+    caret.style.height = (r.height * 0.76) + 'px';
+    caret.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => caret.classList.add('idle'), 600);
+  }
+  function shake() { host.classList.remove('shake'); void host.offsetWidth; host.classList.add('shake'); }
+  // first index at or after j that is not an auto-closed partner waiting to be typed
+  function pastPending(j) { while (j < cells.length && pend[j] && typed[j] === undefined) j++; return j; }
+  function fillTo(j) { while (pos < j) { typed[pos] = cells[pos].ch; paint(pos); pos++; } }
+  // where a capital is automatic: sentence starts, the first letter inside a string, and the word I
+  function capSpot(i) {
+    const prev = cells[i - 1] ? cells[i - 1].ch : '', next = cells[i + 1] ? cells[i + 1].ch : '';
+    if (cells[i].ch === 'I' && (!prev || /[\s"']/.test(prev)) && (!next || /[\s.,!?"']/.test(next))) return true;
+    if (opt.code) return prev === '"' || prev === "'";
+    return sentenceStart(i);
+  }
+  function sentenceStart(i) { return i === 0 || (cells[i - 1].ch === ' ' && /[.!?]/.test(cells[i - 2] ? cells[i - 2].ch : '')); }
+  function typeCh(ch) {
+    if (pos >= cells.length) { shake(); return; }
+    const c = cells[pos];
+    if (c.k === 'f') {
+      const term = cells[pos + 1] && cells[pos + 1].ch;
+      if (ch === term) { if (!c.val) { shake(); return; } pos++; return typeCh(ch); }
+      const j = pastPending(pos + 1);
+      if (c.val && j > pos + 1 && cells[j] && ch === cells[j].ch) { pos++; fillTo(j); return typeCh(ch); }
+      if (ch === '\n' || ch === '"') { shake(); return; }
+      c.val += ch; opt.onKey(true); paint(pos); return;
+    }
+    // skip over auto-closed partners when the key matches what comes after them
+    if (pend[pos] && typed[pos] === undefined && ch !== c.ch) {
+      const j = pastPending(pos);
+      if (cells[j] && cells[j].k !== 'f' && ch === cells[j].ch) { fillTo(j); return typeCh(ch); }
+    }
+    // auto-capitalize the start of a sentence
+    if (ch !== c.ch && /[A-Z]/.test(c.ch) && ch.toUpperCase() === c.ch && capSpot(pos)) ch = c.ch;
+    typed[pos] = ch; auto[pos] = false; const ok = ch === c.ch; opt.onKey(ok);
+    if (ok && pair[pos] != null && typed[pair[pos]] === undefined) { pend[pair[pos]] = true; paint(pair[pos]); }
+    paint(pos); pos++;
+    if (ok && ch === '\n') while (pos < cells.length && cells[pos].k === 'g' && cells[pos].ch === ' ') { typed[pos] = ' '; auto[pos] = true; paint(pos); pos++; }
+  }
+  function backOne() {
+    const c = cells[pos];
+    if (c && c.k === 'f' && c.val) { c.val = c.val.slice(0, -1); paint(pos); return true; }
+    if (pos === 0) return false;
+    if (auto[pos - 1]) {
+      while (pos > 0 && auto[pos - 1]) { pos--; typed[pos] = undefined; auto[pos] = false; paint(pos); }
+      if (pos > 0) { pos--; typed[pos] = undefined; paint(pos); }
+      return true;
+    }
+    pos--;
+    const p = cells[pos];
+    if (p.k === 'f') { p.val = p.val.slice(0, -1); paint(pos); return true; }
+    typed[pos] = undefined;
+    const q = pair[pos]; if (q != null && pend[q]) { if (q >= pos) { typed[q] = undefined; } pend[q] = false; paint(q); }
+    paint(pos); return true;
+  }
+  function charBefore() { const p = cells[pos - 1]; return p ? (p.k === 'f' ? p.val.slice(-1) : typed[pos - 1]) : ''; }
+  function check() {
+    if (pos < cells.length) return;
+    const ok = cells.every((c, i) => c.k === 'f' ? c.val.trim().length > 0 : typed[i] === c.ch);
+    if (ok) { done = true; place(); opt.onDone(); } else shake();
+  }
+  const api = {
+    active: false,
+    get done() { return done; },
+    value() { return cells.map(c => c.k === 'f' ? c.val : c.ch).join(''); },
+    freeValues() { return cells.filter(c => c.k === 'f').map(c => c.val.trim()); },
+    freeCells() { return cells.filter(c => c.k === 'f').map(c => ({ save: c.save, val: c.val.trim() })); },
+    // ⌘↵ while typing: if only auto-closed partners are left, fill them in and finish
+    tryFinish() {
+      if (done) return true;
+      let j = pos;
+      if (cells[j] && cells[j].k === 'f') { if (!cells[j].val.trim()) return false; j++; }
+      if (pastPending(j) !== cells.length) return false;
+      if (pos < j) pos = j;
+      fillTo(cells.length); check(); return done;
+    },
+    activate() { api.active = true; place(); },
+    deactivate() { api.active = false; place(); },
+    place,
+    key(e) {
+      if (done) return false;
+      if (e.key === 'Backspace') {
+        if (e.altKey || e.ctrlKey || e.metaKey) { let n = 0; while (backOne()) { n++; const b = charBefore(); if (b === ' ' || b === '\n' || b === undefined || b === '') break; } }
+        else backOne();
+        place(); return true;
+      }
+      if (e.metaKey || e.ctrlKey) return false;
+      if (e.key === 'Tab') { let n = 0; while (n < 4 && pos < cells.length && cells[pos].k === 'g' && cells[pos].ch === ' ') { typeCh(' '); n++; } place(); check(); return true; }
+      const ch = e.key === 'Enter' ? '\n' : e.key.length === 1 ? e.key : null;
+      if (ch == null) return false;
+      typeCh(ch); place(); check(); return true;
+    }
+  };
+  cells.forEach((_, i) => paint(i));
+  return api;
+}
+
+/* ---------- lessons: JSON from the server, played four levels at a time ---------- */
+const LEVELS = { 1: 'type it all', 2: 'fill the gaps', 3: 'mostly memory', 4: 'on your own' };
+const normOut = t => { const ls = String(t || '').replace(/\r/g, '').split('\n').map(l => l.trimEnd()); while (ls.length && !ls[ls.length - 1]) ls.pop(); return ls; };
+function checkFails(c, code, out) {
+  const ls = normOut(out);
+  switch (c.kind) {
+    case 'code_has': try { return !new RegExp(c.re).test(code); } catch (e) { log('warn', 'bad check regex', c.re); return false; }
+    case 'out_is': return ls.join('\n') !== normOut(c.text).join('\n');
+    case 'out_has': return !ls.join('\n').includes(c.text);
+    case 'first_line': return !ls.length || ls[0].trim().toLowerCase() !== String(c.text).trim().toLowerCase();
+    case 'min_lines': return ls.filter(l => l.trim()).length < +c.n;
+  }
+  return false;
+}
+const lastLine = out => { const ls = normOut(out).filter(l => l.trim()); return ls.length ? ls[ls.length - 1].trim() : ''; };
+function roundsFrom(lesson) {
+  return lesson.rounds.map(r => ({
+    lvl: r.lvl, learn: r.learn, task: r.task, hint: r.hint,
+    code: r.code ? (S => P(r.code, S.prog.profile)) : null,
+    after: (S, t) => {
+      let used = false;
+      t.freeCells().forEach(c => {
+        const key = c.save || (!used && r.save ? (used = true, r.save) : null);
+        if (key && c.val) S.prog.profile[key] = c.val;
+      });
+    },
+    check: r.checks ? (res, code) => { for (const c of r.checks) if (checkFails(c, code, res.out)) return c.msg; return ''; } : null,
+    say: (S, res) => String(r.say || '').replace(/%(out|reason|name)%/g, (_, k) => k === 'out' ? lastLine(res.out) : (S.prog.profile[k] || 'you'))
+  }));
+}
+
+/* ---------- state: S.prog is saved on the server after every step ---------- */
+const blankProg = () => ({ v: 1, profile: {}, placement: null, known: [], at: null, done: {}, xp: 0 });
+let CURR = [];           // curriculum from the server: [{ topic, ready, covers }]
+let ROUNDS = [];         // the four levels of the lesson being played
+const S = { idx: 0, phase: 'boot', lesson: null, prog: blankProg(), done: new Set(), history: [] };
+let R = null;            // current round runtime
+const stage = $('stage');
+function save() { api('PUT', '/api/progress', S.prog).catch(e => log('error', 'progress save failed', e.message)); }
+function event(ev) { api('POST', '/api/event', ev).catch(e => log('warn', 'event save failed', e.message)); }
+
+const lessonCache = {};
+function fetchLesson(topic) {
+  if (!lessonCache[topic]) lessonCache[topic] = api('GET', '/api/lesson?topic=' + encodeURIComponent(topic)).catch(e => { delete lessonCache[topic]; throw e; });
+  return lessonCache[topic];
+}
+const topicNames = () => CURR.map(c => c.topic);
+const TEACHER = '@teacher';   // saved spot meaning "the teacher picks next"
+const titleOf = t => t === TEACHER ? 'your next lesson' : ((CURR.find(c => c.topic === t) || {}).title || t);
+function nextTopic(topic) {
+  const ts = topicNames(), i = ts.indexOf(topic);
+  return ts.slice(i + 1).find(t => !S.prog.known.includes(t)) || null;
+}
+function firstTopic() {
+  return topicNames().find(t => !S.prog.known.includes(t) && (S.prog.done[t] || []).length < 4) || null;
+}
+function canPrefetch(t) { const c = CURR.find(x => x.topic === t); return t && ((c && c.ready) || (pyState.writer && pyState.writer.ready)); }
+
+async function startTopic(topic, lvl = 1) {
+  S.phase = 'loading'; stage.innerHTML = ''; S.lesson = null; paintTop(); paintKeys();
+  const slow = setTimeout(() => { if (S.phase === 'loading') showLoading(topic); }, 250);
+  let data;
+  try { data = await fetchLesson(topic); }
+  catch (e) { clearTimeout(slow); log(e.status === 503 ? 'warn' : 'error', 'lesson load failed', { topic, status: e.status, msg: e.message }); return showFail(topic, lvl, e); }
+  clearTimeout(slow);
+  if (S.phase !== 'loading') return;   // they pressed esc while it was writing
+  S.lesson = { topic, title: data.lesson.title || topic, from: data.from };
+  ROUNDS = roundsFrom(data.lesson);
+  S.done = new Set((S.prog.done[topic] || []).map(l => l - 1));
+  S.prog.at = { topic, lvl }; save();
+  log('info', 'topic start', { topic, lvl, from: data.from });
+  S.idx = Math.max(0, Math.min(ROUNDS.length - 1, lvl - 1));
+  startRound();
+  const nt = nextTopic(topic); if (canPrefetch(nt)) fetchLesson(nt).catch(() => {});
+}
+function showLoading(topic) {
+  stage.innerHTML = '';
+  const c = CURR.find(x => x.topic === topic) || {};
+  stage.append(h('div', { class: 'end rise' },
+    h('h1', { text: 'writing your ' + titleOf(topic) + ' lesson' }),
+    c.why ? h('p', { class: 'why', text: c.why }) : null,
+    h('p', { class: 'breathe', text: writerModel() + ' is writing it for you, then I run every line to check it. Usually under a minute.' })));
+}
+
+/* ---------- the teacher: after the core path, it picks every next lesson ---------- */
+async function teacherNext() {
+  S.phase = 'loading'; stage.innerHTML = ''; S.lesson = null; S.fail = null; paintTop(); paintKeys();
+  const goal = S.prog.profile.reason;
+  stage.append(h('div', { class: 'end rise' },
+    h('h1', { text: "picking what's next" }),
+    h('p', { class: 'breathe', text: 'Your teacher is looking at ' + (goal ? `your goal ("${goal}")` : 'your progress') + ' and how every level went.' })));
+  let entry;
+  try { entry = (await api('POST', '/api/teacher/next', {})).entry; }
+  catch (e) { log(e.status === 503 ? 'warn' : 'error', 'teacher failed', { status: e.status, msg: e.message }); return showFail(TEACHER, 1, e, teacherNext); }
+  if (S.phase !== 'loading') return;
+  if (!CURR.find(c => c.topic === entry.id)) CURR.push({ topic: entry.id, title: entry.title, why: entry.why, kind: entry.kind, teacher: true, ready: false });
+  log('info', 'teacher picked', entry);
+  startTopic(entry.id, 1);
+}
+
+/* ---------- your goal: the teacher shapes every new lesson around it ---------- */
+function goalScreen(back) {
+  S.phase = 'goal'; stage.innerHTML = '';
+  const input = h('input', { class: 'goal-in', type: 'text', maxlength: '160', spellcheck: 'false', autocomplete: 'off',
+                             placeholder: 'build my own tools' });
+  input.value = S.prog.profile.reason || '';
+  S.goal = { back, input };
+  stage.append(h('div', { class: 'end rise' },
+    h('h1', { text: 'what are you learning Python for?' }),
+    h('p', { text: 'Your teacher builds every new lesson around this. Change it any time.' }),
+    input));
+  paintTop(); paintKeys();
+  setTimeout(() => { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }, 30);
+}
+function saveGoal() {
+  const g = S.goal.input.value.trim().replace(/\s+/g, ' ');
+  if (g && g !== S.prog.profile.reason) {
+    S.prog.profile.reason = g; save(); event({ type: 'goal', goal: g }); log('info', 'goal set', g);
+  }
+  const back = S.goal.back; S.goal = null; back();
+}
+function showFail(topic, lvl, e, retry) {
+  S.phase = 'fail'; S.fail = { topic, lvl, retry: retry || (() => startTopic(topic, lvl)) }; stage.innerHTML = '';
+  const noKey = e.status === 503;
+  stage.append(h('div', { class: 'end rise' },
+    h('h1', { text: noKey ? 'the lesson writer is asleep' : "that lesson didn't come out right" }),
+    h('p', { text: noKey
+      ? `There's no ${titleOf(topic)} lesson yet, and the writer needs an OpenCode Go key. Put it in the .env file (see the README), restart, then press ↵.`
+      : `${writerModel()} had trouble writing ${titleOf(topic)}. It's in the log. Press ↵ to try again, or m to pick another model.` }),
+    noKey ? null : h('p', { class: 'note', text: e.message })));
+  paintTop(); paintKeys();
+}
+function home() { S.prog.at ? welcomeScreen() : startScreen(); }
+const writerModel = () => S.prog.model || (pyState.writer && pyState.writer.default) || 'the AI';
+function writerNote() { return h('div', { class: 'writer-note' }, 'new lessons written by ' + writerModel() + '   ', kbd('m'), ' change'); }
+
+/* ---------- model picker: any chat model on the OpenCode Go account ---------- */
+let MS = null;
+async function modelScreen(back) {
+  S.phase = 'models'; stage.innerHTML = '';
+  MS = { back, list: null, i: 0 };
+  stage.append(h('div', { class: 'end rise' }, h('p', { class: 'breathe', text: 'getting the model list…' })));
+  paintTop(); paintKeys();
+  let data;
+  try { data = await api('GET', '/api/models'); }
+  catch (e) { log('error', 'model list failed', e.message); data = { default: writerModel(), chosen: writerModel(), models: [writerModel()] }; }
+  if (S.phase !== 'models' || !MS || MS.back !== back) return;
+  MS.list = data.models; MS.def = data.default;
+  MS.i = Math.max(0, MS.list.indexOf(writerModel()));
+  paintModels();
+}
+function paintModels() {
+  stage.innerHTML = '';
+  const list = h('div', { class: 'wmlist' });
+  MS.list.forEach((m, i) => list.append(h('div', { class: 'wmrow' + (i === MS.i ? ' on' : ''), onclick: () => { MS.i = i; pickModel(); } },
+    h('span', { text: m }), h('small', { text: [m === writerModel() ? 'now' : '', m === MS.def ? 'default' : ''].filter(Boolean).join(' · ') }))));
+  stage.append(h('div', { class: 'end rise' },
+    h('h1', { text: 'who writes your lessons?' }),
+    h('p', { text: 'Only new lessons use this. The ones already made stay the same.' }), list));
+  const on = list.children[MS.i]; if (on) on.scrollIntoView({ block: 'nearest' });
+}
+function pickModel() {
+  const m = MS.list[MS.i];
+  if (m === MS.def) delete S.prog.model; else S.prog.model = m;
+  save(); log('info', 'writer model', m);
+  const back = MS.back; MS = null; back();
+}
+
+function paintTop() {
+  $('xp').textContent = (S.prog.xp || 0) + ' xp';
+  const dots = $('dots'); dots.innerHTML = '';
+  if (!S.lesson || QPHASES.has(S.phase)) {
+    $('lname').textContent = S.phase === 'quiz' || S.phase === 'qfeedback' || S.phase === 'placed' ? 'placement' : S.phase === 'loading' || S.phase === 'fail' ? (S.fail && S.phase === 'fail' ? titleOf(S.fail.topic) : '') : '';
+    return;
+  }
+  $('lname').textContent = S.lesson.title;
+  ROUNDS.forEach((r, i) => dots.append(h('button', { class: 'dot' + (S.done.has(i) ? ' done' : '') + (i === S.idx && S.phase !== 'end' ? ' now' : ''), 'aria-label': 'level ' + r.lvl, tabindex: '-1', onclick: () => go(i) })));
+}
+function paintKeys() {
+  const k = $('keys'); k.innerHTML = '';
+  const item = (keys, label) => h('span', {}, ...keys.map(kbd), label);
+  const p = S.phase;
+  if (p === 'typing') k.append(item([], 'just start typing'), item(['⌘', '↵'], 'run'), item(['esc'], 'restart'), item(['alt', '→'], 'skip'));
+  if (p === 'ready') k.append(item(['⌘', '↵'], 'run'), item(['esc'], 'restart'));
+  if (p === 'edit') k.append(item(['⌘', '↵'], 'run'), item(['esc'], 'restart'));
+  if (p === 'result') k.append(item(['↵'], 'next'), item(['esc'], 'redo this level'));
+  if (p === 'end') k.append(item(['↵'], 'home'));
+  if (p === 'start') k.append(item(['1'], 'brand new'), item(['2'], 'check my level'), item(['↑', '↓'], 'choose'), item(['↵'], 'go'), item(['m'], 'model'));
+  if (p === 'quiz' && Q && Q.write) k.append(item(['⌘', '↵'], 'run'), item(['tab'], "don't know"), item(['esc'], "I'm done"));
+  else if (p === 'quiz') k.append(item(['↵'], 'answer'), item(['tab'], "don't know"), item(['esc'], "I'm done"));
+  if (p === 'qfeedback') k.append(item(['↵'], 'next'), item(['esc'], "I'm done"));
+  if (p === 'placed') k.append(item(['↵'], 'start'), item(['esc'], 'back'));
+  if (p === 'welcome') k.append(item(['1'], 'keep going'), item(['2'], 'quiz'), item(['3'], 'my goal'), item(['↑', '↓'], 'choose'), item(['↵'], 'go'), item(['m'], 'model'));
+  if (p === 'goal') k.append(item(['↵'], 'save'), item(['esc'], 'back'));
+  if (p === 'models') k.append(item(['↑', '↓'], 'choose'), item(['↵'], 'pick'), item(['esc'], 'back'));
+  if (p === 'loading') k.append(item(['esc'], 'back'));
+  if (p === 'fail') k.append(item(['↵'], 'try again'), item(['m'], 'other model'), item(['esc'], 'back'));
+}
+function cue(el, keys, label) { el.innerHTML = ''; if (keys) el.append(...keys.map(kbd), label); }
+
+function go(i) { if (!ROUNDS.length) return; S.idx = Math.max(0, Math.min(ROUNDS.length - 1, i)); S.prog.at = { topic: S.lesson.topic, lvl: S.idx + 1 }; save(); startRound(); }
+
+function startRound() {
+  const rd = ROUNDS[S.idx];
+  stage.innerHTML = '';
+  R = { rd, start: 0, keys: 0, ok: 0, err: 0, fails: 0, typers: [], ti: 0, cm: null };
+  S.phase = 'typing';
+
+  stage.append(h('div', { class: 'eyebrow' }, h('span', { text: S.lesson.title }), h('span', { text: 'level ' + rd.lvl }), h('span', { text: LEVELS[rd.lvl] }), S.lesson.from !== 'builtin' ? h('span', { text: 'written for you' }) : null));
+  const blocks = h('div', { class: 'blocks' }); stage.append(blocks);
+  const onKey = ok => { R.keys++; ok ? R.ok++ : R.err++; };
+  const mk = (label, segs, code) => {
+    const b = h('section', { class: 'block next ' + (code ? 'code' : 'prose') }, h('div', { class: 'lab', text: label }));
+    const host = code ? h('div', { class: 'pane' }) : h('div', {});
+    b.append(host); blocks.append(b);
+    const t = Typer(host, segs, { code, onKey, onDone: () => blockDone() });
+    t.block = b; R.typers.push(t);
+    return b;
+  };
+  if (rd.lvl <= 2 && rd.learn) mk('learn', G(rd.learn), false);
+  mk('task', G(rd.task), false);
+  if (rd.lvl < 4) {
+    const cb = mk('code', rd.code(S), true);
+    R.codeBlock = cb;
+  } else {
+    const b = h('section', { class: 'block next code' }, h('div', { class: 'lab', text: 'code' }));
+    const wrap = h('div', { class: 'edwrap' }); const ta = h('textarea', {});
+    wrap.append(ta); b.append(wrap); blocks.append(b);
+    R.codeBlock = b; R.edwrap = wrap;
+    R.cm = CodeMirror.fromTextArea(ta, {
+      mode: 'python', theme: 'flow', indentUnit: 4, tabSize: 4, indentWithTabs: false, lineNumbers: true,
+      autoCloseBrackets: true, matchBrackets: true, readOnly: 'nocursor', placeholder: 'all yours',
+      extraKeys: {
+        Tab: cm => cm.somethingSelected() ? cm.indentSelection('add') : cm.replaceSelection('    '),
+        'Shift-Tab': cm => cm.indentSelection('subtract'),
+        'Shift-Enter': 'newlineAndIndent',
+        Backspace: cm => {
+          const c = cm.getCursor(), before = cm.getLine(c.line).slice(0, c.ch);
+          if (cm.somethingSelected() || !before.length || /\S/.test(before)) return CodeMirror.Pass;
+          cm.replaceRange('', { line: c.line, ch: c.ch - (((before.length - 1) % 4) + 1) }, c);
+        }
+      }
+    });
+  }
+  R.cueEl = h('div', { class: 'cue' }); R.codeBlock.append(R.cueEl);
+  R.outEl = h('div', { class: 'out' }); R.codeBlock.append(R.outEl);
+  R.afterEl = h('div', { class: 'blocks' }); stage.append(h('div', { style: 'height:22px' }), R.afterEl);
+  activate(0);
+  paintTop(); paintKeys();
+}
+
+function activate(i) {
+  R.ti = i;
+  R.typers.forEach((t, j) => {
+    t.block.classList.toggle('active', j === i);
+    t.block.classList.toggle('past', j < i);
+    t.block.classList.toggle('next', j > i);
+    j === i ? t.activate() : t.deactivate();
+  });
+  if (i >= R.typers.length && R.cm) {
+    R.codeBlock.classList.remove('next'); R.codeBlock.classList.add('active');
+  }
+}
+
+function blockDone() {
+  const t = R.typers[R.ti];
+  if (R.ti < R.typers.length - 1) { activate(R.ti + 1); return; }
+  if (R.rd.lvl < 4) {
+    if (R.rd.after) R.rd.after(S, t);
+    S.phase = 'ready'; cue(R.cueEl, ['⌘', '↵'], 'run it'); paintKeys();
+  } else {
+    activate(R.typers.length);
+    S.phase = 'edit'; R.edwrap.classList.add('on');
+    R.cm.setOption('readOnly', false); R.cm.focus(); R.cm.refresh();
+    cue(R.cueEl, ['⌘', '↵'], 'run it'); paintKeys();
+  }
+}
+
+function showOut(res) {
+  R.outEl.innerHTML = '';
+  const lines = (res.out || '').split('\n').filter((l, i, a) => l !== '' || i < a.length - 1);
+  lines.forEach(l => R.outEl.append(h('div', { class: 'o rise', text: l })));
+  if (!res.ok) R.outEl.append(h('div', { class: 'o e rise', text: res.err + (res.line ? '   (line ' + res.line + ')' : '') }));
+  if (!res.ok && !lines.length && !res.err) R.outEl.append(h('div', { class: 'o e', text: 'nothing printed' }));
+}
+
+function friendly(res) {
+  if (res.offline) return 'The flow.py server is not answering, so I could not run that. Is it still running?';
+  if (res.timeout) return 'That never finished. Make sure your loop has a way to stop.';
+  const e = res.err || '';
+  if (/NameError/.test(e)) return "Python doesn't know that name. If it's text, it needs quotes.";
+  if (/SyntaxError|EOL|unterminated|IndentationError/.test(e)) return "Python couldn't read that. Check that every quote and bracket has a partner.";
+  return 'That errored. The red line says what Python tripped on.';
+}
+
+let running = false;
+async function run() {
+  if (running) return; running = true;
+  const rd = R.rd, code = rd.lvl < 4 ? R.typers[R.typers.length - 1].value() : R.cm.getValue();
+  if (rd.lvl === 4 && !code.trim()) { running = false; return; }
+  const slowRun = setTimeout(() => { cue(R.cueEl, null); R.cueEl.textContent = 'running…'; R.cueEl.classList.add('breathe'); }, 300);
+  const res = await runPy(code);
+  clearTimeout(slowRun); R.cueEl.classList.remove('breathe');
+  running = false;
+  showOut(res);
+  if (R.cm) R.cm.getAllMarks().forEach(m => m.clear()), [...Array(R.cm.lineCount()).keys()].forEach(l => R.cm.removeLineClass(l, 'background', 'err-line'));
+  let problem = res.ok ? (rd.check ? rd.check(res, code) : '') : friendly(res);
+  if (problem) {
+    if (!res.offline) R.fails++;
+    if (R.cm && res.line) R.cm.addLineClass(res.line - 1, 'background', 'err-line');
+    R.afterEl.innerHTML = '';
+    R.afterEl.append(h('p', { class: 'say rise', text: problem }));
+    if (R.fails >= 2 && rd.hint) R.afterEl.append(h('p', { class: 'say dimmer rise', text: 'hint: ' + rd.hint }));
+    if (rd.lvl === 4) { cue(R.cueEl, ['⌘', '↵'], 'run it again'); R.cm.focus(); }
+    else { cue(R.cueEl, ['⌘', '↵'], 'run it again'); }
+    log('info', 'round miss', { round: S.idx, problem });
+    return;
+  }
+  finish(res);
+}
+
+function finish(res) {
+  const rd = R.rd, topic = S.lesson.topic;
+  const secs = R.start ? Math.round((performance.now() - R.start) / 1000) : 0;
+  const acc = R.keys ? Math.round(R.ok / R.keys * 100) : 100;
+  const gain = 10 + rd.lvl * 5 + (acc >= 95 ? 5 : 0) - Math.min(R.fails * 2, 6);
+  const doneLvls = S.prog.done[topic] || (S.prog.done[topic] = []);
+  const first = !doneLvls.includes(rd.lvl);
+  if (first) { S.prog.xp = (S.prog.xp || 0) + gain; doneLvls.push(rd.lvl); }
+  S.done.add(S.idx);
+  S.history.push({ topic, lvl: rd.lvl, acc, secs, err: R.err, fails: R.fails });
+  const nt = S.idx < ROUNDS.length - 1 ? null : nextTopic(topic);
+  S.prog.at = S.idx < ROUNDS.length - 1 ? { topic, lvl: rd.lvl + 1 } : { topic: nt || TEACHER, lvl: 1 };
+  save();
+  event({ type: 'round', topic, lvl: rd.lvl, acc, secs, errors: R.err, fails: R.fails, keys: R.keys });
+  log('info', 'round done', { topic, lvl: rd.lvl, acc, secs, errors: R.err, fails: R.fails });
+  S.phase = 'result';
+  if (R.cm) { R.cm.setOption('readOnly', 'nocursor'); R.cm.getInputField().blur(); R.edwrap.classList.remove('on'); }
+  R.typers.forEach(t => t.deactivate());
+  cue(R.cueEl, null);
+  R.afterEl.innerHTML = '';
+  const mm = String(Math.floor(secs / 60)) + ':' + String(secs % 60).padStart(2, '0');
+  R.afterEl.append(
+    h('p', { class: 'say rise', text: rd.say(S, res) }),
+    h('div', { class: 'res rise' },
+      h('div', {}, h('small', { text: 'acc' }), h('b', { text: acc + '%' })),
+      h('div', {}, h('small', { text: 'time' }), h('b', { class: 'plain', text: mm })),
+      h('div', {}, h('small', { text: 'errors' }), h('b', { class: 'plain', text: String(R.err + R.fails) })),
+      h('div', {}, h('small', { text: 'xp' }), h('b', { text: first ? '+' + gain : '+0' }))),
+    h('div', { class: 'cue rise' }, kbd('↵'), S.idx < ROUNDS.length - 1 ? 'level ' + (rd.lvl + 1) : nt ? 'next lesson: ' + titleOf(nt) : 'your teacher picks what\'s next')
+  );
+  paintTop(); paintKeys();
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function next() {
+  if (S.idx < ROUNDS.length - 1) { S.idx++; startRound(); return; }
+  const nt = nextTopic(S.lesson.topic);
+  if (nt) startTopic(nt, 1); else teacherNext();
+}
+
+function endScreen() {
+  S.phase = 'end'; stage.innerHTML = ''; S.lesson = null;
+  const hs = S.history;
+  const acc = hs.length ? Math.round(hs.reduce((a, b) => a + b.acc, 0) / hs.length) : 0;
+  const secs = hs.reduce((a, b) => a + b.secs, 0);
+  const reason = S.prog.profile.reason;
+  stage.append(h('div', { class: 'end rise' },
+    h('h1', { text: 'you walked the whole path' }),
+    h('p', { text: (reason ? `Your reason: "${reason}." ` : '') + 'Every topic is done. You can write real Python now.' }),
+    h('div', { class: 'res' },
+      h('div', {}, h('small', { text: 'levels today' }), h('b', { text: String(hs.length) })),
+      h('div', {}, h('small', { text: 'avg acc' }), h('b', { class: 'plain', text: acc + '%' })),
+      h('div', {}, h('small', { text: 'time' }), h('b', { class: 'plain', text: Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') })),
+      h('div', {}, h('small', { text: 'xp' }), h('b', { text: String(S.prog.xp || 0) })))));
+  paintTop(); paintKeys();
+}
+
+/* ---------- start screen + placement check ---------- */
+const QPHASES = new Set(['boot', 'start', 'welcome', 'quiz', 'qfeedback', 'placed', 'loading', 'fail', 'models', 'goal']);
+const TOPICS = ['print', 'variables', 'strings', 'f-strings', 'math', 'lists', 'if / else', 'for loops', 'dicts', 'functions', 'comprehensions'];
+const QUIZ = [
+  { topic: 'print', code: 'print("hello", "there")', a: 'hello there' },
+  { topic: 'variables', code: 'x = 5\nx = x + 2\nprint(x)', a: '7' },
+  { topic: 'strings', code: 'name = "ada"\nprint(name.upper())', a: 'ADA' },
+  { topic: 'f-strings', code: 'n = 3\nprint(f"{n} cats")', a: '3 cats' },
+  { topic: 'math', code: 'print(7 // 2, 7 % 2)', a: '3 1' },
+  { topic: 'lists', code: 'nums = [4, 8, 15]\nnums.append(16)\nprint(nums[1], len(nums))', a: '8 4' },
+  { topic: 'if / else', code: 'x = 3\nif x > 5:\n    print("big")\nelse:\n    print("small")', a: 'small' },
+  { topic: 'for loops', code: 'total = 0\nfor n in range(4):\n    total += n\nprint(total)', a: '6' },
+  { topic: 'for loops', write: true, task: 'Write a loop that prints 1, 2 and 3, each on its own line.',
+    check: out => out.trim().split(/\s+/).join(' ') === '1 2 3' },
+  { topic: 'dicts', code: 'ages = {"ana": 30, "bo": 25}\nages["bo"] += 1\nprint(ages["bo"])', a: '26' },
+  { topic: 'functions', code: 'def double(n):\n    return n * 2\n\nprint(double(double(3)))', a: '12' },
+  { topic: 'comprehensions', code: 'print([n * n for n in range(5) if n % 2 == 0])', a: '[0, 4, 16]' }
+];
+let Q = null;        // current question runtime
+let pick = 0;        // start screen selection
+const norm = s => String(s).trim().replace(/^["']|["']$/g, '').replace(/\s+/g, '');
+
+function codeView(src) {
+  const toks = tokenize(src), tx = h('div', { class: 'tx' });
+  [...src].forEach((ch, i) => tx.append(ch === '\n' ? '\n' : h('span', { class: 'ch ok t-' + toks[i], text: ch })));
+  return h('div', { class: 'pane' }, tx);
+}
+
+function startScreen() {
+  S.phase = 'start'; stage.innerHTML = '';
+  if (pick > 1) pick = 0;
+  const opts = [
+    ['brand new', "Start at the very first lesson. No quiz."],
+    ['check my level', 'A quick quiz, about two minutes. Skips what you already know.']
+  ];
+  const list = h('div', { class: 'choices' });
+  opts.forEach(([t, d], i) => list.append(h('div', { class: 'choice' + (i === pick ? ' on' : ''), onclick: () => choose(i) },
+    h('kbd', { text: String(i + 1) }), h('div', {}, h('b', { text: t }), h('small', { text: d })))));
+  stage.append(h('div', { class: 'end rise' },
+    h('h1', { text: 'where are you starting?' }),
+    h('p', { text: 'Tell me how much Python you already know, so you never sit through stuff you have down.' }),
+    list, writerNote()));
+  paintTop(); paintKeys();
+}
+function welcomeScreen() {
+  S.phase = 'welcome'; stage.innerHTML = ''; S.lesson = null;
+  const at = S.prog.at, name = S.prog.profile.name;
+  const goal = S.prog.profile.reason;
+  const opts = [['keep going', at.topic === TEACHER ? 'Your teacher picks your next lesson.' : `${titleOf(at.topic)}, level ${at.lvl}. Right where you left off.`],
+                ['check my level again', 'Retake the quick quiz.'],
+                ['my goal', goal ? `"${goal}". Your teacher builds lessons around it.` : 'Tell your teacher what you are learning Python for.']];
+  const list = h('div', { class: 'choices' });
+  opts.forEach(([t, d], i) => list.append(h('div', { class: 'choice' + (i === pick ? ' on' : ''), onclick: () => chooseWelcome(i) },
+    h('kbd', { text: String(i + 1) }), h('div', {}, h('b', { text: t }), h('small', { text: d })))));
+  stage.append(h('div', { class: 'end rise' },
+    h('h1', { text: name ? `welcome back, ${name}.` : 'welcome back.' }),
+    h('p', { text: `${S.prog.xp || 0} xp so far. Your spot is saved.` }),
+    list, writerNote()));
+  paintTop(); paintKeys();
+}
+function chooseWelcome(i) {
+  if (i === 0) return S.prog.at.topic === TEACHER ? teacherNext() : startTopic(S.prog.at.topic, S.prog.at.lvl);
+  if (i === 2) return goalScreen(welcomeScreen);
+  S.quiz = { i: 0, results: [], t0: performance.now() };
+  askQuestion();
+}
+function choose(i) {
+  if (i === 0) {
+    S.prog.placement = { brandNew: true }; S.prog.known = []; save();
+    event({ type: 'placement', brandNew: true }); log('info', 'placement', 'brand new');
+    return startTopic(firstTopic() || 'print', 1);
+  }
+  S.quiz = { i: 0, results: [], t0: performance.now() };
+  askQuestion();
+}
+
+function askQuestion() {
+  const qz = S.quiz, q = QUIZ[qz.i];
+  S.phase = 'quiz'; stage.innerHTML = '';
+  Q = { q, write: !!q.write, t0: performance.now(), cm: null, input: null };
+  stage.append(h('div', { class: 'eyebrow' }, h('span', { text: 'placement' }), h('span', { text: (qz.i + 1) + ' of ' + QUIZ.length }), h('span', { text: q.topic })));
+  stage.append(h('div', { class: 'qbar' }, h('i', { style: 'width:' + Math.round(qz.i / QUIZ.length * 100) + '%' })));
+  const blk = h('section', { class: 'block active code' }, h('div', { class: 'lab', text: q.write ? 'write it' : 'what does this print?' }));
+  stage.append(h('div', { class: 'blocks' }, blk));
+  if (q.write) {
+    blk.append(h('p', { class: 'qtask', text: q.task }));
+    const wrap = h('div', { class: 'edwrap on' }), ta = h('textarea', {}); wrap.append(ta); blk.append(wrap);
+    Q.cm = CodeMirror.fromTextArea(ta, {
+      mode: 'python', theme: 'flow', indentUnit: 4, tabSize: 4, lineNumbers: true, autoCloseBrackets: true, matchBrackets: true,
+      placeholder: 'all yours',
+      extraKeys: { Tab: false, 'Shift-Enter': 'newlineAndIndent',
+        Backspace: cm => { const c = cm.getCursor(), b = cm.getLine(c.line).slice(0, c.ch); if (cm.somethingSelected() || !b.length || /\S/.test(b)) return CodeMirror.Pass; cm.replaceRange('', { line: c.line, ch: c.ch - (((b.length - 1) % 4) + 1) }, c); } }
+    });
+    setTimeout(() => { Q.cm.refresh(); Q.cm.focus(); }, 0);
+  } else {
+    blk.append(codeView(q.code));
+    Q.input = h('input', { class: 'ans', id: 'ans', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'What prints?', placeholder: 'type what it prints' });
+    blk.append(h('label', { class: 'ansrow' }, h('span', { text: '›' }), Q.input));
+    setTimeout(() => Q.input.focus(), 0);
+  }
+  Q.fb = h('div', { class: 'blocks' }); stage.append(h('div', { style: 'height:18px' }), Q.fb);
+  paintTop(); paintKeys();
+}
+
+async function submitAnswer(skip) {
+  const q = Q.q, qz = S.quiz;
+  let ok = false, shown = q.a;
+  if (skip) ok = false;
+  else if (q.write) {
+    const code = Q.cm.getValue(); if (!code.trim()) return;
+    const res = await runPy(code);
+    shown = res.ok ? (res.out || '(nothing printed)') : res.err;
+    ok = res.ok && q.check(res.out);
+    if (!ok) { // let them retry the write question; Tab gives up
+      Q.fb.innerHTML = '';
+      Q.fb.append(h('div', { class: 'out' }, ...shown.split('\n').map(l => h('div', { class: 'o' + (res.ok ? '' : ' e'), text: l }))),
+        h('p', { class: 'say rise', text: res.ok ? 'Not quite. I need 1, 2 and 3 on separate lines. Try again, or tab if you are not sure.' : 'That errored. Try again, or tab if you are not sure.' }));
+      Q.cm.focus(); return;
+    }
+  } else {
+    const v = Q.input.value; if (!v.trim()) return;
+    ok = norm(v) === norm(q.a);
+  }
+  const ms = Math.round(performance.now() - Q.t0);
+  qz.results.push({ topic: q.topic, ok, skip: !!skip, ms });
+  log('info', 'placement answer', { topic: q.topic, ok, skip: !!skip, ms });
+  if (Q.input) Q.input.disabled = true;
+  if (Q.cm) Q.cm.setOption('readOnly', 'nocursor');
+  Q.fb.innerHTML = '';
+  const last = qz.i >= QUIZ.length - 1;
+  if (ok) {
+    Q.fb.append(h('p', { class: 'say rise', text: 'yep.' }));
+    S.phase = 'qfeedback'; paintKeys();
+    setTimeout(() => { if (S.phase === 'qfeedback' && Q.q === q) advanceQuiz(last); }, 650);
+  } else {
+    Q.fb.append(h('p', { class: 'say dimmer rise' }, skip ? 'No worries. ' : '', q.write ? 'That one is a loop.' : 'It prints ', q.write ? '' : h('b', { class: 'shown', text: q.a })));
+    S.phase = 'qfeedback'; paintKeys();
+  }
+  Q.last = last;
+}
+function advanceQuiz(last) {
+  if (last) return placed();
+  S.quiz.i++; askQuestion();
+}
+
+function placed(stopped) {
+  S.phase = 'placed'; stage.innerHTML = '';
+  const rs = S.quiz.results, status = {};
+  // stopping early = assume the unanswered topics are new
+  for (const t of TOPICS) {
+    const mine = rs.filter(r => r.topic === t);
+    status[t] = !mine.length ? 'learn' : mine.every(r => r.ok) ? 'known' : 'learn';
+  }
+  const gap = TOPICS.find(t => status[t] !== 'known') || null;
+  const known = TOPICS.filter(t => status[t] === 'known').length;
+  S.placement = { status, gap, stopped: !!stopped, answered: rs.length, secs: Math.round((performance.now() - S.quiz.t0) / 1000) };
+  S.prog.placement = S.placement; S.prog.known = TOPICS.filter(t => status[t] === 'known'); save();
+  event({ type: 'placement', ...S.placement, answers: rs });
+  log('info', 'placement', S.placement);
+  const map = h('div', { class: 'map' });
+  TOPICS.forEach(t => map.append(h('div', { class: 'mrow ' + status[t] + (t === gap ? ' gap' : '') },
+    h('i', {}), h('span', { text: t }), h('small', { text: t === gap ? 'start here' : status[t] === 'known' ? 'got it' : status[t] === 'learn' ? 'to learn' : 'not checked' }))));
+  const head = known === 0 ? 'Starting from the top.' : !gap ? 'You know all of these.' : `You already know ${known} of ${TOPICS.length}.`;
+  const sub = !gap ? "We'll go past the basics." : known ? `We'll skip those and start at ${gap}.` : `We'll start at ${gap}.`;
+  const kids = [h('h1', { text: head }), h('p', { text: sub + (stopped && rs.length < QUIZ.length ? ' You stopped early, so the rest count as new.' : '') }), map];
+  stage.append(h('div', { class: 'end rise' }, ...kids));
+  paintTop(); paintKeys();
+}
+function startFromPlacement() {
+  const t = (S.placement && S.placement.gap) || firstTopic();
+  if (t) startTopic(t, 1); else teacherNext();
+}
+
+function quizKey(e) {
+  const p = S.phase, enter = e.key === 'Enter', cmd = e.metaKey || e.ctrlKey;
+  if (p === 'boot') return;
+  if (p === 'loading') { if (e.key === 'Escape') { e.preventDefault(); home(); } return; }
+  if (p === 'goal') {
+    if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); return saveGoal(); }
+    if (e.key === 'Escape') { e.preventDefault(); const b = S.goal.back; S.goal = null; return b(); }
+    return;
+  }
+  if (p === 'models') {
+    if (!MS || !MS.list) { if (e.key === 'Escape') { e.preventDefault(); const b = MS && MS.back; MS = null; (b || home)(); } return; }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); MS.i = (MS.i + (e.key === 'ArrowDown' ? 1 : -1) + MS.list.length) % MS.list.length; return paintModels(); }
+    if (enter && !e.repeat) { e.preventDefault(); return pickModel(); }
+    if (e.key === 'Escape') { e.preventDefault(); const b = MS.back; MS = null; return b(); }
+    return;
+  }
+  if ((p === 'start' || p === 'welcome') && (e.key === 'm' || e.key === 'M') && !cmd) { e.preventDefault(); return modelScreen(p === 'start' ? startScreen : welcomeScreen); }
+  if (p === 'fail') {
+    if (e.key === 'm' || e.key === 'M') { e.preventDefault(); const f = S.fail; return modelScreen(f.retry); }
+    if (e.key === 'Escape') { e.preventDefault(); return home(); }
+    if (enter && !e.repeat) { e.preventDefault(); return S.fail.retry(); }
+    return;
+  }
+  if (p === 'welcome') {
+    if (e.key === '1' || e.key === '2' || e.key === '3') { e.preventDefault(); return chooseWelcome(+e.key - 1); }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); pick = ((pick % 3) + (e.key === 'ArrowDown' ? 1 : 2)) % 3; return welcomeScreen(); }
+    if (enter) { e.preventDefault(); return chooseWelcome(pick); }
+    return;
+  }
+  if (p === 'start') {
+    if (e.key === '1' || e.key === '2') { e.preventDefault(); return choose(+e.key - 1); }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); pick = pick ? 0 : 1; return startScreen(); }
+    if (enter) { e.preventDefault(); return choose(pick); }
+    return;
+  }
+  if (e.key === 'Escape') { e.preventDefault(); return (p === 'quiz' || p === 'qfeedback') ? placed(true) : home(); }
+  if (p === 'quiz') {
+    if (e.key === 'Tab') { e.preventDefault(); return submitAnswer(true); }
+    if (enter && Q.write) { if (cmd) { e.preventDefault(); submitAnswer(false); } return; }
+    if (enter) { e.preventDefault(); return submitAnswer(false); }
+    return;
+  }
+  if (!enter || e.repeat) return;
+  e.preventDefault();
+  if (p === 'qfeedback') advanceQuiz(Q.last);
+  else if (p === 'placed') startFromPlacement();
+}
+
+/* ---------- keyboard: the only controller ---------- */
+window.addEventListener('keydown', e => {
+  if (QPHASES.has(S.phase)) { quizKey(e); return; }
+  if (e.key === 'Escape') { e.preventDefault(); if (S.phase !== 'end') startRound(); return; }
+  if (e.altKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); go(S.idx + (e.key === 'ArrowRight' ? 1 : -1)); return; }
+  const enter = e.key === 'Enter', cmdEnter = enter && (e.metaKey || e.ctrlKey);
+  // ⌘↵ always runs. Plain ↵ and ⇧↵ are new lines while you type.
+  if (S.phase === 'edit') { if (cmdEnter) { e.preventDefault(); run(); } return; }
+  if (S.phase === 'typing') {
+    const t = R.typers[R.ti]; if (!t) return;
+    if (cmdEnter) {
+      e.preventDefault();
+      if (R.ti === R.typers.length - 1 && R.rd.lvl < 4 && t.tryFinish() && S.phase === 'ready') run();
+      return;
+    }
+    if (!R.start && e.key.length === 1) R.start = performance.now();
+    if (t.key(e)) e.preventDefault();
+    return;
+  }
+  if (!enter || e.repeat) return;
+  e.preventDefault();
+  if (S.phase === 'ready') { if (cmdEnter) run(); }
+  else if (S.phase === 'result') next();
+  else if (S.phase === 'end') home();
+}, true);
+
+const veil = $('veil');
+const syncVeil = () => { veil.hidden = document.hasFocus(); };
+window.addEventListener('blur', syncVeil); window.addEventListener('focus', syncVeil);
+veil.addEventListener('click', () => { window.focus(); veil.hidden = true; if (S.phase === 'edit' && R.cm) R.cm.focus(); if (S.phase === 'quiz' && Q) (Q.cm || Q.input).focus(); });
+window.addEventListener('resize', () => R && R.typers.forEach(t => t.place()));
+document.fonts && document.fonts.ready.then(() => R && R.typers.forEach(t => t.place()));
+
+(async function boot() {
+  stage.append(h('div', { class: 'end rise' }, h('p', { class: 'breathe', text: 'waking up…' })));
+  const hl = await health;
+  if (!hl) {
+    stage.innerHTML = '';
+    stage.append(h('div', { class: 'end rise' }, h('h1', { text: "the server isn't running" }),
+      h('p', { text: 'Start it with  make flowpy-app  and reload this page.' })));
+    return;
+  }
+  try {
+    const [cur, prog] = await Promise.all([api('GET', '/api/curriculum'), api('GET', '/api/progress')]);
+    CURR = cur.topics.concat(cur.extra || []);
+    S.prog = { ...blankProg(), ...(prog || {}) };
+    S.prog.profile = S.prog.profile || {}; S.prog.known = S.prog.known || []; S.prog.done = S.prog.done || {};
+  } catch (e) { log('error', 'boot failed', e.message); }
+  stage.innerHTML = '';
+  home();
+})();
+setTimeout(syncVeil, 300);
+window.__flowpy = { S, go, run, startScreen, startTopic, home, api };
+})();
+</script>
+</body>
+</html>

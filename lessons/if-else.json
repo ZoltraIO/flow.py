@@ -1,0 +1,50 @@
+{
+  "topic": "if / else",
+  "title": "if / else",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "if runs code only when something is true. The if line ends with a colon, and the code under it moves in 4 spaces. else runs when it is not true.",
+      "task": "Check the battery. Warn if it is low.",
+      "code": "battery = 15\nif battery < 20:\n    print(\"charge me\")\nelse:\n    print(\"all good\")",
+      "say": "charge me. 15 is less than 20, so the if part ran and else got skipped."
+    },
+    {
+      "lvl": 2,
+      "learn": "== asks if two things are equal. One = stores a value. Two == compare.",
+      "task": "Check a password.",
+      "code": "word = \"open sesame\"\nif word [[==]] \"open sesame\":\n    print(\"come in\")\n[[else]]:\n    print(\"nope\")",
+      "say": "come in. Two == compared, and they matched."
+    },
+    {
+      "lvl": 3,
+      "task": "If score is 90 or more, print great. Otherwise print keep going.",
+      "code": "score = 72\n[[if score >= 90:]]\n    [[print(\"great\")]]\n[[else:]]\n    [[print(\"keep going\")]]",
+      "say": "keep going. 72 is not 90 or more, so else ran."
+    },
+    {
+      "lvl": 4,
+      "task": "Make temp hold 30. If temp is over 25, print hot. Otherwise print cool.",
+      "hint": "temp = 30, then if temp > 25: and print(\"hot\") under it, then else: and print(\"cool\").",
+      "solution": "temp = 30\nif temp > 25:\n    print(\"hot\")\nelse:\n    print(\"cool\")",
+      "checks": [
+        {
+          "kind": "out_is",
+          "text": "hot",
+          "msg": "With temp at 30, it should print hot."
+        },
+        {
+          "kind": "code_has",
+          "re": "\\bif\\b",
+          "msg": "Use an if."
+        },
+        {
+          "kind": "code_has",
+          "re": "\\belse\\s*:",
+          "msg": "Add an else: for the cool side."
+        }
+      ],
+      "say": "hot. Your code made a choice."
+    }
+  ]
+}

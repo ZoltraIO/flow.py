@@ -1,0 +1,45 @@
+{
+  "topic": "strings",
+  "title": "strings",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "Strings have methods. A method is a small action you run with a dot. .upper() turns every letter into a capital. .lower() makes them small.",
+      "task": "Save a word in shout. Print it in capitals.",
+      "code": "shout = \"{{any word|hey}}\"\nprint(shout.upper())",
+      "say": "%out%. The dot reached into the string and ran upper() on it."
+    },
+    {
+      "lvl": 2,
+      "learn": "A + between two strings glues them together. len() counts the characters in a string, spaces too.",
+      "task": "Glue two words into one. Print it, then print how long it is.",
+      "code": "first = \"tool\"\nsecond = \"box\"\nword = first [[+]] second\nprint(word)\nprint([[len]](word))",
+      "say": "toolbox, 7 letters. + glued them, len() counted."
+    },
+    {
+      "lvl": 3,
+      "task": "Glue py and thon. Print the word in capitals. Then print its length.",
+      "code": "word = \"py\" [[+ \"thon\"]]\nprint([[word.upper()]])\n[[print(len(word))]]",
+      "say": "PYTHON, then 6. Three moves, all from memory."
+    },
+    {
+      "lvl": 4,
+      "task": "Make a variable called tool that holds hammer. Print it in capitals.",
+      "hint": "tool = \"hammer\" on one line. Then print(tool.upper()).",
+      "solution": "tool = \"hammer\"\nprint(tool.upper())",
+      "checks": [
+        {
+          "kind": "out_is",
+          "text": "HAMMER",
+          "msg": "I need HAMMER, all capitals."
+        },
+        {
+          "kind": "code_has",
+          "re": "\\.upper\\(\\)",
+          "msg": "Let .upper() do the capitals for you."
+        }
+      ],
+      "say": "HAMMER. You called a method with nothing to copy."
+    }
+  ]
+}

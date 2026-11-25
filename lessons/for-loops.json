@@ -1,0 +1,45 @@
+{
+  "topic": "for loops",
+  "title": "for loops",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "A for loop runs the same code once for each item in a list. Each time around, the name after for holds the next item.",
+      "task": "Print every tool, one per line.",
+      "code": "for tool in [\"hammer\", \"saw\", \"drill\"]:\n    print(tool)",
+      "say": "Three lines from two lines of code. That is the point of a loop."
+    },
+    {
+      "lvl": 2,
+      "learn": "range(1, 4) gives the numbers from 1 up to 4, but not 4 itself. So you get 1, 2 and 3.",
+      "task": "Count from 1 to 3.",
+      "code": "for n in [[range]](1, 4):\n    [[print(n)]]",
+      "say": "1, 2, 3. It stopped before 4."
+    },
+    {
+      "lvl": 3,
+      "task": "Add up the numbers 1 to 5 with a loop. Call each number n.",
+      "code": "total = 0\n[[for n in range(1, 6):]]\n    [[total = total + n]]\nprint([[total]])",
+      "say": "15. The loop added 1, 2, 3, 4 and 5 into total."
+    },
+    {
+      "lvl": 4,
+      "task": "Use a loop to print 2, 4 and 6, each on its own line.",
+      "hint": "for n in range(1, 4): and under it print(n * 2).",
+      "solution": "for n in range(1, 4):\n    print(n * 2)",
+      "checks": [
+        {
+          "kind": "out_is",
+          "text": "2\n4\n6",
+          "msg": "I need 2, 4 and 6 on separate lines."
+        },
+        {
+          "kind": "code_has",
+          "re": "\\bfor\\b",
+          "msg": "Use a for loop for this one."
+        }
+      ],
+      "say": "2, 4, 6. One line inside a loop did all of it."
+    }
+  ]
+}

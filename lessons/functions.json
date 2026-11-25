@@ -1,0 +1,50 @@
+{
+  "topic": "functions",
+  "title": "functions",
+  "rounds": [
+    {
+      "lvl": 1,
+      "learn": "A function is a named recipe. def makes one. The code inside only runs when you call the function by its name with ().",
+      "task": "Make a greet function. Call it twice.",
+      "code": "def greet():\n    print(\"hello\")\n\ngreet()\ngreet()",
+      "say": "hello, twice. One recipe, used two times."
+    },
+    {
+      "lvl": 2,
+      "learn": "A function can take inputs, called parameters. return hands an answer back to whoever called it.",
+      "task": "Make double. Use it on 21.",
+      "code": "def double(n):\n    [[return]] n * 2\n\nprint([[double]](21))",
+      "say": "42. double got 21 and handed back 42."
+    },
+    {
+      "lvl": 3,
+      "task": "Write add, which takes a and b and returns their sum. Print add(2, 3).",
+      "code": "[[def add(a, b):]]\n    [[return a + b]]\n\n[[print(add(2, 3))]]",
+      "say": "5. You wrote a function and used it."
+    },
+    {
+      "lvl": 4,
+      "task": "Write a function called square that returns a number times itself. Print square(9).",
+      "hint": "def square(n): and under it return n * n. Then print(square(9)).",
+      "solution": "def square(n):\n    return n * n\n\nprint(square(9))",
+      "checks": [
+        {
+          "kind": "out_is",
+          "text": "81",
+          "msg": "square(9) should print 81."
+        },
+        {
+          "kind": "code_has",
+          "re": "def\\s+square\\s*\\(",
+          "msg": "Make it with def square(...):"
+        },
+        {
+          "kind": "code_has",
+          "re": "\\breturn\\b",
+          "msg": "Hand the answer back with return."
+        }
+      ],
+      "say": "81. Your own recipe, written from nothing."
+    }
+  ]
+}
