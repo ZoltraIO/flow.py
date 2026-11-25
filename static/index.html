@@ -149,6 +149,45 @@ main{flex:1 1 auto;width:100%;max-width:880px;margin:0 auto;display:flex;flex-di
 .note{font-size:13px!important;color:var(--ghost)!important}
 .breathe{animation:breathe 2.4s ease-in-out infinite}@keyframes breathe{50%{opacity:.45}}
 .veil{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);color:var(--fg);font-size:15px;z-index:5;cursor:pointer}
+/* help chat: a quiet side panel. ⌘/ opens it, esc goes back to typing. */
+:root{--chatw:400px}
+.chat-btn{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--dim);cursor:pointer;padding:0;transition:color .15s ease,border-color .15s ease,background .15s ease}
+.chat-btn:hover{color:var(--fg);border-color:var(--line)}
+.chat-btn.on{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 35%,var(--line));background:var(--surface)}
+.chat-btn svg{width:17px;height:17px}
+@media (min-width:1000px){body.chat-open #app{padding-right:calc(var(--chatw) + 32px)}}
+.chat{position:fixed;top:10px;right:max(10px,env(safe-area-inset-right,0px));bottom:10px;width:var(--chatw);max-width:calc(100vw - 20px);display:flex;flex-direction:column;background:#0b0b0e;border:1px solid var(--line);border-radius:14px;z-index:6;font-family:var(--mono);box-shadow:0 10px 40px rgba(0,0,0,.6);animation:slidein .18s ease-out}
+@keyframes slidein{from{opacity:0;transform:translateX(12px)}}
+.chat-head{display:flex;align-items:center;gap:8px;padding:14px 12px 12px 18px;border-bottom:1px solid var(--line)}
+.chat-head b{font-weight:500;font-size:14px;color:var(--fg);flex:1}
+.chat-head button{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;border:0;background:transparent;color:var(--dim);cursor:pointer;padding:0}
+.chat-head button:hover{color:var(--fg);background:var(--surface)}
+.chat-head svg{width:16px;height:16px}
+.chat-log{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:18px;min-height:0;overscroll-behavior:contain}
+.chat-empty{color:var(--dim);font-size:13px;line-height:1.7;margin:auto 0;text-align:center;padding:0 10px}
+.chat-empty kbd,.chat-keys kbd{font-family:var(--mono);font-size:11px;color:var(--fg);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--surface)}
+.msg{font-size:14px;line-height:1.65;color:var(--fg);min-width:0;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;max-width:85%;background:var(--surface);border:1px solid var(--line);border-radius:14px 14px 4px 14px;padding:9px 14px;white-space:pre-wrap}
+.msg.ai p{margin:0 0 10px}.msg.ai p:last-child{margin-bottom:0}
+.msg.ai ul,.msg.ai ol{margin:0 0 10px;padding-left:20px}
+.msg.ai li{margin:2px 0}
+.msg.ai b{font-weight:500;color:#fff}
+.msg code{font-family:var(--mono);font-size:.92em;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--st)}
+.msg pre{margin:0 0 10px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto}
+.msg pre code{background:none;border:0;padding:0;color:var(--fg);white-space:pre}
+.msg.err{color:var(--bad);font-size:13px}
+.chat-div{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--ghost);letter-spacing:.04em}
+.chat-div::before,.chat-div::after{content:"";flex:1;height:1px;background:var(--line)}
+.msg.wait{color:var(--dim)}
+.chat-foot{padding:10px 12px 12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.chat-ctx{font-size:11px;color:var(--ghost);letter-spacing:.04em;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-ctx::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--st);margin-right:7px;vertical-align:1px}
+.chat-in{resize:none;width:100%;box-sizing:border-box;max-height:160px;min-height:44px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 14px;color:var(--fg);font:inherit;font-size:14px;line-height:1.5;outline:none;caret-color:var(--accent)}
+.chat-in:focus{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.chat-in::placeholder{color:var(--ghost)}
+.chat-keys{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ghost);padding:0 4px}
+.chat-keys span{display:flex;gap:5px;align-items:center}
+@media (prefers-reduced-motion:reduce){.chat{animation:none}}
 @media (prefers-reduced-motion:reduce){.caret{transition:none}.caret.idle,.rise,.shake,.py::before,.breathe{animation:none}}
 </style>
 
@@ -156,12 +195,25 @@ main{flex:1 1 auto;width:100%;max-width:880px;margin:0 auto;display:flex;flex-di
   <header class="top">
     <div class="logo">flow<b>.</b><i>py</i></div>
     <div class="prog"><span id="lname"></span><div class="dots" id="dots"></div></div>
-    <div class="meta"><span id="xp">0 xp</span><span class="py" id="py" data-s="loading">python</span></div>
+    <div class="meta"><span id="xp">0 xp</span><span class="py" id="py" data-s="loading">python</span>
+      <button class="chat-btn" id="chatBtn" tabindex="-1" aria-label="help chat (⌘/)" title="help · ⌘/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12.5a7.5 7.5 0 0 1-11.1 6.6L4 20l1-4.4A7.5 7.5 0 1 1 20 12.5Z"/><path d="M12.5 8.6l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="currentColor" stroke="none"/></svg></button></div>
   </header>
   <main id="stage" aria-live="polite"></main>
   <footer class="keys" id="keys"></footer>
 </div>
 <div class="veil" id="veil" hidden>click anywhere, then keep typing</div>
+<aside class="chat" id="chat" hidden aria-label="help chat">
+  <div class="chat-head"><b>help</b>
+    <button id="chatNew" tabindex="-1" aria-label="new chat" title="new chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+    <button id="chatClose" tabindex="-1" aria-label="close" title="close · esc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="chat-log" id="chatLog"></div>
+  <div class="chat-foot">
+    <div class="chat-ctx" id="chatCtx"></div>
+    <textarea class="chat-in" id="chatIn" rows="1" placeholder="ask anything…" aria-label="your question"></textarea>
+    <div class="chat-keys"><span><kbd>↵</kbd> send</span><span><kbd>⇧</kbd><kbd>↵</kbd> new line</span><span><kbd>esc</kbd> back to typing</span></div>
+  </div>
+</aside>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
@@ -372,6 +424,10 @@ function Typer(host, segs, opt) {
     get done() { return done; },
     value() { return cells.map(c => c.k === 'f' ? c.val : c.ch).join(''); },
     freeValues() { return cells.filter(c => c.k === 'f').map(c => c.val.trim()); },
+    snapshot() {
+      return cells.map((c, i) => (i === pos && !done ? '▌' : '') + (c.k === 'f' ? (c.val ? '[[' + c.val + ']]' : '[[ ]]')
+        : typed[i] !== undefined ? typed[i] : c.k === 'b' ? (c.ch === '\n' ? '\n' : '_') : c.ch)).join('') + (pos >= cells.length && !done ? '▌' : '');
+    },
     freeCells() { return cells.filter(c => c.k === 'f').map(c => ({ save: c.save, val: c.val.trim() })); },
     // ⌘↵ while typing: if only auto-closed partners are left, fill them in and finish
     tryFinish() {
@@ -421,6 +477,7 @@ const lastLine = out => { const ls = normOut(out).filter(l => l.trim()); return 
 function roundsFrom(lesson) {
   return lesson.rounds.map(r => ({
     lvl: r.lvl, learn: r.learn, task: r.task, hint: r.hint,
+    answer: r.code ? r.code.replace(/\[\[([\s\S]*?)\]\]/g, '$1').replace(/\{\{([\s\S]*?)\}\}/g, '<their own words: $1>') : (r.solution || ''),
     code: r.code ? (S => P(r.code, S.prog.profile)) : null,
     after: (S, t) => {
       let used = false;
@@ -572,13 +629,14 @@ function pickModel() {
 }
 
 function paintTop() {
+  paintChatCtx();
   $('xp').textContent = (S.prog.xp || 0) + ' xp';
   const dots = $('dots'); dots.innerHTML = '';
   if (!S.lesson || QPHASES.has(S.phase)) {
     $('lname').textContent = S.phase === 'quiz' || S.phase === 'qfeedback' || S.phase === 'placed' ? 'placement' : S.phase === 'loading' || S.phase === 'fail' ? (S.fail && S.phase === 'fail' ? titleOf(S.fail.topic) : '') : '';
     return;
   }
-  $('lname').textContent = S.lesson.title;
+  $('lname').textContent = S.lesson.title; paintChatCtx();
   ROUNDS.forEach((r, i) => dots.append(h('button', { class: 'dot' + (S.done.has(i) ? ' done' : '') + (i === S.idx && S.phase !== 'end' ? ' now' : ''), 'aria-label': 'level ' + r.lvl, tabindex: '-1', onclick: () => go(i) })));
 }
 function paintKeys() {
@@ -600,6 +658,7 @@ function paintKeys() {
   if (p === 'models') k.append(item(['↑', '↓'], 'choose'), item(['↵'], 'pick'), item(['esc'], 'back'));
   if (p === 'loading') k.append(item(['esc'], 'back'));
   if (p === 'fail') k.append(item(['↵'], 'try again'), item(['m'], 'other model'), item(['esc'], 'back'));
+  if (p !== 'boot') k.append(item(['⌘', '/'], 'help'));
 }
 function cue(el, keys, label) { el.innerHTML = ''; if (keys) el.append(...keys.map(kbd), label); }
 
@@ -710,6 +769,7 @@ async function run() {
   showOut(res);
   if (R.cm) R.cm.getAllMarks().forEach(m => m.clear()), [...Array(R.cm.lineCount()).keys()].forEach(l => R.cm.removeLineClass(l, 'background', 'err-line'));
   let problem = res.ok ? (rd.check ? rd.check(res, code) : '') : friendly(res);
+  R.lastRun = { ok: res.ok && !problem, code: code.slice(0, 3000), output: (res.out || '').slice(0, 1500), error: res.err || '', game_said: problem || 'passed' };
   if (problem) {
     if (!res.offline) R.fails++;
     if (R.cm && res.line) R.cm.addLineClass(res.line - 1, 'background', 'err-line');
@@ -893,6 +953,7 @@ async function submitAnswer(skip) {
     const code = Q.cm.getValue(); if (!code.trim()) return;
     const res = await runPy(code);
     shown = res.ok ? (res.out || '(nothing printed)') : res.err;
+    Q.lastRun = { ok: false, code: code.slice(0, 3000), output: (res.out || '').slice(0, 1500), error: res.err || '' };
     ok = res.ok && q.check(res.out);
     if (!ok) { // let them retry the write question; Tab gives up
       Q.fb.innerHTML = '';
@@ -1002,8 +1063,141 @@ function quizKey(e) {
   else if (p === 'placed') startFromPlacement();
 }
 
+/* ---------- help chat: sees your screen, nudges before it tells ---------- */
+const chatEl = $('chat'), chatLog = $('chatLog'), chatIn = $('chatIn'), chatBtn = $('chatBtn');
+const CH = { open: false, msgs: [], id: '', busy: false };
+try { const saved = JSON.parse(sessionStorage.getItem('flowpy-chat') || 'null'); if (saved && Array.isArray(saved.msgs)) { CH.msgs = saved.msgs; CH.id = saved.id || ''; } } catch {}
+const newChatId = () => 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+if (!CH.id) CH.id = newChatId();
+function keepChat() { try { sessionStorage.setItem('flowpy-chat', JSON.stringify({ id: CH.id, msgs: CH.msgs.slice(-40) })); } catch {} }
+const SCREENS = { start: 'the start screen', welcome: 'the home screen', quiz: 'the placement quiz', qfeedback: 'the placement quiz', placed: 'the placement results',
+  goal: 'the "my goal" screen', models: 'the model picker', loading: 'a loading screen (a lesson is being written)', fail: 'an error screen', end: 'the end screen' };
+function inLesson() { return S.lesson && R && ['typing', 'ready', 'edit', 'result'].includes(S.phase); }
+function chatContext() {
+  if ((S.phase === 'quiz' || S.phase === 'qfeedback') && Q && S.quiz) {
+    const q = Q.q;
+    return { quiz: true, topic: q.topic, number: (S.quiz.i + 1) + ' of ' + QUIZ.length,
+      kind: q.write ? 'write code' : 'read code and type what it prints',
+      question: q.write ? q.task : q.code,
+      typed: q.write ? (Q.cm ? Q.cm.getValue() || '(the editor is empty)' : '') : (Q.input ? Q.input.value || '(nothing typed yet)' : ''),
+      last_run: Q.lastRun || null, answered: S.phase === 'qfeedback' };
+  }
+  if (!inLesson()) return { screen: SCREENS[S.phase] || 'a menu' };
+  const rd = R.rd, t = R.typers[R.ti], codeTyper = rd.lvl < 4 ? R.typers[R.typers.length - 1] : null;
+  const labels = R.typers.map(x => x.block.querySelector('.lab').textContent);
+  const step = S.phase === 'result' ? 'passed this level and is looking at the result'
+    : S.phase === 'ready' ? 'finished typing the code and has not run it yet (⌘↵ runs)'
+    : S.phase === 'edit' ? 'writing the code in the editor'
+    : 'typing the ' + (labels[R.ti] || 'text') + ' block';
+  return { lesson: S.lesson.title, level: rd.lvl, learn: rd.lvl <= 2 ? rd.learn : '', task: rd.task, answer: rd.answer,
+    typed: codeTyper ? codeTyper.snapshot() : (R.cm ? R.cm.getValue() || '(the editor is empty)' : ''),
+    step, last_run: R.lastRun || null, misses: R.fails, hint: rd.hint || '' };
+}
+// which screen a message is about: a lesson (any level), one quiz question, or a menu
+function screenKey() {
+  if ((S.phase === 'quiz' || S.phase === 'qfeedback') && S.quiz) return 'quiz:' + S.quiz.i;
+  return inLesson() ? 'lesson:' + S.lesson.topic : 'screen:' + S.phase;
+}
+function screenLabel() {
+  if ((S.phase === 'quiz' || S.phase === 'qfeedback') && S.quiz && Q) return 'placement · ' + Q.q.topic + ' · ' + (S.quiz.i + 1) + ' of ' + QUIZ.length;
+  return inLesson() ? S.lesson.title + ' · level ' + R.rd.lvl : (SCREENS[S.phase] || 'this screen');
+}
+function paintChatCtx() {
+  const el = $('chatCtx'); if (!el) return;
+  el.textContent = 'sees: ' + screenLabel() + (inLesson() || S.phase === 'quiz' ? ' · what you typed' : '');
+}
+// tiny safe markdown: ``` fences, `code`, **bold**, - lists, paragraphs. Built from DOM nodes, never innerHTML.
+function inline(el, s) {
+  const re = /`([^`\n]+)`|\*\*([^*\n]+)\*\*/g; let last = 0, m;
+  while ((m = re.exec(s))) {
+    if (m.index > last) el.append(s.slice(last, m.index));
+    el.append(m[1] != null ? h('code', { text: m[1] }) : h('b', { text: m[2] }));
+    last = re.lastIndex;
+  }
+  if (last < s.length) el.append(s.slice(last));
+  return el;
+}
+function md(text) {
+  const frag = document.createDocumentFragment(), parts = String(text).split(/```[^\n]*\n?/);
+  parts.forEach((part, i) => {
+    if (i % 2) { frag.append(h('pre', {}, h('code', { text: part.replace(/\n$/, '') }))); return; }
+    part.split(/\n\s*\n/).forEach(block => {
+      const lines = block.split('\n').filter(l => l.trim()); if (!lines.length) return;
+      const ul = lines.every(l => /^\s*[-*] /.test(l)), ol = lines.every(l => /^\s*\d+[.)] /.test(l));
+      if (ul || ol) { const list = h(ol ? 'ol' : 'ul', {}); lines.forEach(l => list.append(inline(h('li', {}), l.replace(/^\s*([-*]|\d+[.)]) /, '')))); frag.append(list); }
+      else { const p = h('p', {}); lines.forEach((l, j) => { if (j) p.append(h('br', {})); inline(p, l); }); frag.append(p); }
+    });
+  });
+  return frag;
+}
+function paintChat() {
+  chatLog.innerHTML = '';
+  if (!CH.msgs.length && !CH.busy) {
+    chatLog.append(h('div', { class: 'chat-empty' }, 'Stuck? Ask me anything.', h('br', {}),
+      'I can see your lesson, the hidden code, what you typed, and your last run. I\'ll nudge before I tell.'));
+  }
+  let lastKey = null;
+  CH.msgs.forEach(m => {
+    if (m.role === 'user' && m.key && lastKey && m.key !== lastKey) chatLog.append(h('div', { class: 'chat-div', text: 'now on ' + (m.where || 'a new screen') }));
+    if (m.role === 'user' && m.key) lastKey = m.key;
+    chatLog.append(m.role === 'user' ? h('div', { class: 'msg me', text: m.content })
+    : m.error ? h('div', { class: 'msg err', text: m.content }) : (() => { const d = h('div', { class: 'msg ai' }); d.append(md(m.content)); return d; })());
+  });
+  if (CH.busy) chatLog.append(h('div', { class: 'msg wait breathe', text: 'thinking…' }));
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+function relayout() { requestAnimationFrame(() => { if (R) { R.typers.forEach(t => t.place()); if (R.cm) R.cm.refresh(); } }); }
+function openChat() {
+  CH.open = true; chatEl.hidden = false; document.body.classList.add('chat-open'); chatBtn.classList.add('on');
+  paintChatCtx(); paintChat(); focusChat(); relayout();
+}
+function backToGame() {
+  chatIn.blur();
+  if (S.phase === 'edit' && R && R.cm) R.cm.focus();
+  else if (S.phase === 'quiz' && Q) (Q.cm || Q.input).focus();
+  else if (S.phase === 'goal') { const g = document.querySelector('.goal-in'); if (g) g.focus(); }
+}
+function closeChat() {
+  CH.open = false; chatEl.hidden = true; document.body.classList.remove('chat-open'); chatBtn.classList.remove('on');
+  backToGame(); relayout();
+}
+// focus after the key event ends, or the code editor takes it back
+function focusChat() { setTimeout(() => chatIn.focus(), 0); }
+function toggleChat() { CH.open ? (chatEl.contains(document.activeElement) ? closeChat() : focusChat()) : openChat(); }
+async function sendChat() {
+  const q = chatIn.value.trim(); if (!q || CH.busy) return;
+  chatIn.value = ''; growChat();
+  const key = screenKey();
+  CH.msgs.push({ role: 'user', content: q, key, where: screenLabel() }); CH.busy = true; paintChat();
+  let from = CH.msgs.length - 1;
+  while (from > 0 && !(CH.msgs[from - 1].role === 'user' && CH.msgs[from - 1].key !== key)) from--;
+  const history = CH.msgs.slice(from).filter(m => !m.error).map(m => ({ role: m.role, content: m.content }));
+  try {
+    const r = await api('POST', '/api/chat', { messages: history, context: chatContext(), chat: CH.id });
+    CH.msgs.push({ role: 'assistant', content: r.reply });
+  } catch (e) {
+    log('warn', 'chat failed', e.message);
+    CH.msgs.push({ role: 'assistant', error: true, content: e.data && e.data.error === 'no_key'
+      ? 'The helper needs an OpenCode Go key in .env (see the README). The game still works without it.'
+      : 'That didn\'t go through: ' + e.message + '. Try again, or press m on the home screen to pick another model.' });
+  }
+  CH.busy = false; keepChat(); paintChat();
+}
+function growChat() { chatIn.style.height = 'auto'; chatIn.style.height = Math.min(chatIn.scrollHeight + 2, 160) + 'px'; }
+chatIn.addEventListener('input', growChat);
+chatIn.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendChat(); }
+  else if (e.key === 'Escape') { e.preventDefault(); closeChat(); }
+});
+chatBtn.addEventListener('click', e => { e.preventDefault(); CH.open ? closeChat() : openChat(); });
+$('chatClose').addEventListener('click', closeChat);
+$('chatNew').addEventListener('click', () => { CH.msgs = []; CH.id = newChatId(); keepChat(); paintChat(); chatIn.focus(); });
+
 /* ---------- keyboard: the only controller ---------- */
 window.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === '/') { e.preventDefault(); e.stopPropagation(); toggleChat(); return; }
+  if (chatEl.contains(e.target)) return;   // typing a question: the game ignores it
+  if (CH.open && e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeChat(); return; }   // esc closes help, never restarts the level
   if (QPHASES.has(S.phase)) { quizKey(e); return; }
   if (e.key === 'Escape') { e.preventDefault(); if (S.phase !== 'end') startRound(); return; }
   if (e.altKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); go(S.idx + (e.key === 'ArrowRight' ? 1 : -1)); return; }
@@ -1041,7 +1235,7 @@ document.fonts && document.fonts.ready.then(() => R && R.typers.forEach(t => t.p
   if (!hl) {
     stage.innerHTML = '';
     stage.append(h('div', { class: 'end rise' }, h('h1', { text: "the server isn't running" }),
-      h('p', { text: 'Start it with  make flowpy-app  and reload this page.' })));
+      h('p', { text: 'Start it with  python server.py  and reload this page.' })));
     return;
   }
   try {
@@ -1054,7 +1248,7 @@ document.fonts && document.fonts.ready.then(() => R && R.typers.forEach(t => t.p
   home();
 })();
 setTimeout(syncVeil, 300);
-window.__flowpy = { S, go, run, startScreen, startTopic, home, api };
+window.__flowpy = { S, go, run, startScreen, startTopic, home, api, chatContext, openChat, closeChat };
 })();
 </script>
 </body>

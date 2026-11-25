@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lessons  # noqa: E402
 import settings as settings_mod  # noqa: E402
 import teacher as teacher_mod  # noqa: E402
+import tutor as tutor_mod  # noqa: E402
 import writer as writer_mod  # noqa: E402
 from runner import run_python  # noqa: E402
 
@@ -64,6 +65,7 @@ class App:
         self.store = lessons.Store(s.lessons_dir, s.data_dir)
         self.writer = writer or writer_mod.Writer(s)
         self.teacher = teacher_mod.Teacher(s, self.writer, s.data_dir)
+        self.tutor = tutor_mod.Tutor(self.writer, s.data_dir)
         self._checked: dict[str, float] = {}   # cached lesson file -> mtime that passed the current checks
         self.progress_path = s.data_dir / "progress.json"
         self.events_path = s.data_dir / "events.jsonl"
@@ -338,6 +340,19 @@ def make_handler(app: App):
                     except writer_mod.WriterFailed as exc:
                         log.error("teacher failed", extra={"data": {"why": str(exc)}})
                         return self._json(502, {"error": "writer_failed", "message": str(exc)})
+                if path == "/api/chat":
+                    messages = tutor_mod.clean_messages(data.get("messages"))
+                    if messages is None:
+                        return self._json(400, {"error": "messages must be a list that ends with a user message"})
+                    ctx = data.get("context") if isinstance(data.get("context"), dict) else {}
+                    try:
+                        text = app.tutor.reply(messages, ctx, app.chosen_model(), str(data.get("chat") or ""))
+                    except writer_mod.WriterUnavailable as exc:
+                        return self._json(503, {"error": "no_key", "message": str(exc)})
+                    except Exception as exc:  # model/API trouble: log it, tell the page
+                        log.error("chat failed", exc_info=exc)
+                        return self._json(502, {"error": "chat_failed", "message": f"{type(exc).__name__}: {exc}"})
+                    return self._json(200, {"reply": text, "model": app.chosen_model()})
                 if path == "/api/event":
                     app.add_event(data)
                     return self._json(200, {"ok": True})

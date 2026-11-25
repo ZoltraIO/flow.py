@@ -39,6 +39,8 @@ cp .env.example .env     # then paste your key after OPENCODE_GO_API_KEY=
 
 Restart the server. Press **m** on the home screen to pick which model writes your lessons. The default is `deepseek-v4.1-flash`.
 
+**Stuck? Ask the helper.** Click the chat icon at the top right, or press **⌘/** (ctrl+/). A side panel opens. The helper can see your screen: the lesson, the hidden code, what you've typed, and your last run. It nudges first, and gives the answer when you ask for it. Press esc to go back to typing.
+
 Every lesson the AI writes goes through checks before you see it:
 - Every code sample runs in real Python.
 - Each level-4 answer has to pass its own grading checks.
@@ -56,6 +58,7 @@ If a lesson fails, the problems go back to the model so it can fix them.
 | `lessons.py` | Holds the lesson format, the topic order, and the checks every lesson must pass. |
 | `lessons/*.json` | Hand-checked lessons for the 11 placement topics. |
 | `writer.py` | Asks the AI model to write lessons for topics that have no file yet. |
+| `tutor.py` | The helper in the chat panel. Each question comes with a snapshot of your screen. |
 | `teacher.py` | Picks each next lesson after the core path. Its memory is `data/teacher.json`. |
 | `tools/build_lessons.py` | The source for the built-in lessons. It rewrites and re-checks them. |
 | `config.yaml` | Every setting: port, default model, time limits. |
@@ -69,9 +72,10 @@ These files are created as you play. They are never committed:
 - `data/events.jsonl`: one line per finished level
 - `data/lessons/`: lessons the AI wrote, cached
 - `data/teacher.json`: the teacher's notes about you
+- `data/chats.jsonl`: your questions to the helper and its answers
 - `logs/server.jsonl`: errors, readable at `GET /api/logs?level=error`
 
-The only thing that leaves your computer is the lesson writer's request to OpenCode Go, and only if you add a key.
+The only things that leave your computer are the requests to OpenCode Go (lessons, teacher picks, and helper questions with your screen snapshot), and only if you add a key.
 
 **Safety note:** the server runs whatever Python you type, on your own computer. It only listens on 127.0.0.1, so keep it that way.
 

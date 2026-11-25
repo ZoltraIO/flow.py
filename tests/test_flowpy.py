@@ -183,10 +183,11 @@ def live(tmp_path, monkeypatch):
 
     def chat(model, system, messages):
         fake.chats.append(messages[-1]["content"])
+        fake.systems.append(system)
         return fake.teacher_replies.pop(0)
 
     fake.fail, fake.write, fake.models_used, fake.chat, fake.chats = False, write, [], chat, []
-    fake.teacher_replies = []
+    fake.teacher_replies, fake.systems = [], []
     fake.ready = lambda: False
     fake.models = lambda: [S.model, "claude-haiku-5-5"]
     app = server.App(s, writer=fake)
@@ -304,3 +305,49 @@ def test_cached_lesson_that_breaks_new_rules_is_rewritten(live):
     live.app.store.save(bad)
     code, body = call(live, "GET", "/api/lesson?topic=while%20loops")
     assert code == 200 and body["from"] == "written" and live.writer.calls == ["while loops"]
+
+
+def test_chat_sees_the_screen_and_saves_the_talk(live):
+    live.writer.teacher_replies.append("Split each row with .split(), then add int(parts[1]).")
+    ctx = {"lesson": "split lines into fields", "level": 3, "task": "Add up the numbers.",
+           "answer": 'rows = ["tea 2"]\ntotal = 0\nprint(total)', "typed": "rows = [\"tea 2\"]\n_____",
+           "last_run": {"ok": False, "err": "NameError: name 'totl' is not defined"}, "misses": 2}
+    msgs = [{"role": "user", "content": "im dying over here bro"}]
+    code, body = call(live, "POST", "/api/chat", {"messages": msgs, "context": ctx, "chat": "c1"})
+    assert code == 200 and body["reply"].startswith("Split each row")
+    system = live.writer.systems[-1]
+    for needle in ("split lines into fields", "level 3", "total = 0", "_____", "totl", "Failed runs on this level so far: 2"):
+        assert needle in system, needle
+    row = json.loads((live.app.s.data_dir / "chats.jsonl").read_text().splitlines()[-1])
+    assert row["q"] == "im dying over here bro" and row["lesson"] == "split lines into fields" and row["chat"] == "c1"
+
+
+def test_chat_rejects_bad_messages_and_handles_menus(live):
+    assert call(live, "POST", "/api/chat", {"messages": []})[0] == 400
+    assert call(live, "POST", "/api/chat", {"messages": [{"role": "system", "content": "x"}]})[0] == 400
+    assert call(live, "POST", "/api/chat", {"messages": [{"role": "assistant", "content": "hi"}]})[0] == 400
+    live.writer.teacher_replies.append("A list holds many things in order.")
+    code, _ = call(live, "POST", "/api/chat", {"messages": [{"role": "user", "content": "what is a list"}],
+                                                "context": {"screen": "the home screen"}})
+    assert code == 200 and "the home screen, not inside a lesson" in live.writer.systems[-1]
+
+
+def test_chat_without_key_says_so(live):
+    def no_key(model, system, messages):
+        raise writer_mod.WriterUnavailable("No key")
+    live.writer.chat = no_key
+    code, body = call(live, "POST", "/api/chat", {"messages": [{"role": "user", "content": "help"}]})
+    assert code == 503 and body["error"] == "no_key"
+
+
+def test_chat_sees_the_placement_quiz(live):
+    live.writer.teacher_replies.append("Your loop adds 1 before it prints.")
+    ctx = {"quiz": True, "topic": "for loops", "number": "9 of 12", "kind": "write code",
+           "question": "Write a loop that prints 1, 2 and 3, each on its own line.",
+           "typed": "n = 0\nfor n in range(1, 4):\n    n += 1\n    print(n)",
+           "last_run": {"ok": False, "output": "2\n3\n4", "error": ""}}
+    code, _ = call(live, "POST", "/api/chat", {"messages": [{"role": "user", "content": "why not 1 2 3"}], "context": ctx})
+    system = live.writer.systems[-1]
+    assert code == 200
+    for needle in ("placement quiz, question 9 of 12", "prints 1, 2 and 3", "n += 1", "2\\n3\\n4", "don't write the passing answer"):
+        assert needle in system, needle
