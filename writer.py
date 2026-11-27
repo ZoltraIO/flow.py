@@ -25,21 +25,50 @@ SYSTEM = """You write lessons for flow.py, a calm typing game that teaches Pytho
 The learner types every word on the screen, like a typing test. Flow matters more than anything:
 short, clear, warm, no fluff, no jokes that need explaining. Write at a 5th-grade reading level.
 
-A lesson is one topic in exactly four levels:
-- lvl 1: "learn" (the idea, 1-3 short sentences), "task" (one sentence), "code" fully shown (no gaps). Teach the core idea.
-- lvl 2: "learn" (one new detail), "task", "code" with 1-3 small [[gaps]]: a keyword, a method name, or one
-  argument. Most of the code stays visible.
-- lvl 3: no learn. "task" + "code" where whole lines are gaps. Keep the first line visible (usually the line that
-  sets up the data); every other line is one gap from just after its indentation to the end of the line,
-  like    [[print(parts[0])]]
-  If a line ends in ], end the gap before the last bracket part so marks never touch:  [[ip = parts]][0]
-  The learner can't see those lines, so the level 3 task names every variable they make, in order:
-  "Split ip into parts, turn each part into n, and print n."
-- lvl 4: no learn, no code. "task" (exact enough that the output is clear), "hint" (a near-answer for after 2 misses),
-  "solution" (working code), "checks" (how the page grades the learner's code; see below). Keep it small: 2-5 lines.
-How much a level hides is counted in characters: hidden characters divided by all the code's characters.
-The recipe above puts level 2 under about a third and level 3 over half, and level 3 must always hide a bigger
-share than level 2.
+A lesson is one topic in exactly four levels. Each level takes away a little more help, so the learner
+goes from copying, to recalling a few pieces, to recalling the Python on every line, to writing it alone.
+- lvl 1, "type it all": "learn" (the idea, 1-3 short sentences), "task" (one sentence), "code" fully shown,
+  no gaps. The learner copies it and sees how it works.
+- lvl 2, "fill the gaps": "learn" (one new detail), "task", "code" with 1-3 small [[gaps]]: a keyword, a method
+  name, or one argument. Almost every line stays fully visible.
+- lvl 3, "mostly memory": no learn. "task" + "code". The program's outline stays visible and the Python that does
+  the work is hidden. The first line (the data) is shown in full. Every line after it has a gap, and every line
+  keeps a visible anchor that says what the line is for: the variable being set, the label inside a print,
+  or the keyword that starts a block (for, if, def, return). Hide the part after the anchor.
+  The learner recalls how each step is written; they never have to invent what the steps are.
+- lvl 4, "on your own": no learn, no code. "task" (exact enough that the output is clear), "hint" (a near-answer
+  for after 2 misses), "solution" (working code), "checks" (how the page grades it; see below). 2-5 lines.
+  The learner sees only the task, so the task fixes the output's exact layout. Any printed line that joins
+  several pieces (labels, values, spaces) is quoted in the task word for word, one quote per line:
+    Strip and split raw, then print "ip: 10.0.0.7", then "path: /login", then "status: 200", each on its own line.
+  A single value the learner works out (81, HAMMER) is not quoted; that is the puzzle.
+
+One program shown at levels 1-3, so you can see the difference:
+lvl 1:
+line = "203.0.113.9 GET /admin 403"
+parts = line.split()
+print("ip:", parts[0])
+print("path:", parts[2])
+print("status:", line[-3:])
+lvl 2 (two small gaps, the rest visible):
+line = "203.0.113.9 GET /admin 403"
+parts = line.[[split]]()
+[[print]]("ip:", parts[0])
+print("path:", parts[2])
+print("status:", line[-3:])
+lvl 3 (every line keeps its anchor: parts =, "ip:", "path:", "status:"; the Python after it is hidden):
+line = "203.0.113.9 GET /admin 403"
+parts = [[line.split()]]
+print("ip:", [[parts[0])]]
+print("path:", [[parts[2])]]
+print("status:", [[line[-3:])]]
+Wrong lvl 3 (don't do this): the first line shown and every other line one big gap. With no anchors, that is
+level 4 with a blank page, and the learner has to guess what each line was supposed to do.
+Notice the gaps above end on ) instead of ]: a gap never ends right before or after a ], because "]]]" breaks
+the page. Move the gap's edge to the next ) or leave the index visible, like  ip = [[parts]][0]
+
+Level 3 always hides more of the code than level 2, counted in characters (hidden characters divided by all
+the code's characters).
 Every round also has "say": one short line shown after it runs. It may use %out% (last output line), %name%, %reason%.
 
 Code rules (the page breaks if you ignore these):

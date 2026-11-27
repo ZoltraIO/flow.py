@@ -296,12 +296,39 @@ def _check_lvl4(r: dict, timeout: float, max_chars: int) -> list[str]:
         return p + ["solution is required"]
     if not isinstance(checks, list) or not checks:
         return p + ["checks are required"]
+    return (
+        p
+        + _solution_problems(sol, checks, timeout, max_chars)
+        + _unstated_layout(r.get("task") or "", checks)
+    )
+
+
+def _solution_problems(sol: str, checks: list, timeout: float, max_chars: int) -> list[str]:
     res = run_python(sol, timeout, max_chars)
     if not res["ok"]:
-        return p + [f"solution fails when run: {res['err']}"]
+        return [f"solution fails when run: {res['err']}"]
+    return [x for c in checks for x in _check_item(c, sol, res["out"])]
+
+
+def _unstated_layout(task: str, checks: list) -> list[str]:
+    """A graded line that joins several pieces must be spelled out in the task.
+
+    A single worked-out value (81, HAMMER) is the learner's job. But a line like
+    "ip: 10.0.0.7" has labels and spacing nobody can guess, so the task shows it.
+    Python's own list and dict printouts are left alone.
+    """
+    out = []
     for c in checks:
-        p += _check_item(c, sol, res["out"])
-    return p
+        if not isinstance(c, dict) or c.get("kind") != "out_is":
+            continue
+        for ln in norm_out(str(c.get("text", ""))):
+            ln = ln.strip()
+            if " " in ln and ln[0] not in "[{(" and ln not in task:
+                out.append(
+                    f'level 4 grades the exact line "{ln}", but the task never shows it. '
+                    f'Quote it in the task word for word, like: Print "{ln}".'
+                )
+    return out
 
 
 def _gap_growth_problems(fractions: dict[int, float]) -> list[str]:
@@ -309,9 +336,9 @@ def _gap_growth_problems(fractions: dict[int, float]) -> list[str]:
         return [
             "level 3 must hide more of the code than level 2 "
             f"(level 2 hides {fractions[2]:.0%} of its characters, "
-            f"level 3 hides {fractions[3]:.0%}). In level 3, keep only the first "
-            "line visible and make every other line one whole-line gap; "
-            "in level 2, hide 1-3 small pieces"
+            f"level 3 hides {fractions[3]:.0%}). In level 3, give every line after the "
+            "first a gap that hides the Python after its anchor (the name being set, "
+            "the print label, or the block keyword); in level 2, hide only 1-3 small pieces"
         ]
     return []
 

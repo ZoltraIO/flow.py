@@ -481,3 +481,18 @@ def test_chat_sees_the_placement_quiz(live):
         "don't write the passing answer",
     ):
         assert needle in system, needle
+
+
+def test_level4_task_must_show_a_joined_output_line():
+    vague = {
+        "task": "Split raw, then print the IP, path, and status.",
+        "checks": [{"kind": "out_is", "text": "10.0.0.7 /login 200", "msg": "x"}],
+    }
+    clear = {"task": 'Split raw, then print "10.0.0.7 /login 200".', "checks": vague["checks"]}
+    worked_out = {
+        "task": "Print square(9).",
+        "checks": [{"kind": "out_is", "text": "81", "msg": "x"}],
+    }
+    assert "never shows it" in lessons._unstated_layout(vague["task"], vague["checks"])[0]
+    assert lessons._unstated_layout(clear["task"], clear["checks"]) == []
+    assert lessons._unstated_layout(worked_out["task"], worked_out["checks"]) == []

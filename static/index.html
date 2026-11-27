@@ -149,6 +149,11 @@ main{flex:1 1 auto;width:100%;max-width:880px;margin:0 auto;display:flex;flex-di
 .note{font-size:13px!important;color:var(--ghost)!important}
 .breathe{animation:breathe 2.4s ease-in-out infinite}@keyframes breathe{50%{opacity:.45}}
 .veil{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);color:var(--fg);font-size:15px;z-index:5;cursor:pointer}
+.leave{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:6;padding:0 max(16px,env(safe-area-inset-left,0px))}
+.leave-box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:26px 30px;max-width:420px;display:grid;gap:10px}
+.leave-box h2{margin:0;font-size:20px;font-weight:500;color:var(--fg)}
+.leave-box p{margin:0;color:var(--dim);font-size:14px;line-height:1.55}
+.leave-box .leave-keys{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px;color:var(--dim);font-size:13px}
 /* help chat: a quiet side panel. ⌘/ opens it, esc goes back to typing. */
 :root{--chatw:400px}
 .chat-btn{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--dim);cursor:pointer;padding:0;transition:color .15s ease,border-color .15s ease,background .15s ease}
@@ -202,6 +207,7 @@ main{flex:1 1 auto;width:100%;max-width:880px;margin:0 auto;display:flex;flex-di
   <footer class="keys" id="keys"></footer>
 </div>
 <div class="veil" id="veil" hidden>click anywhere, then keep typing</div>
+<div class="leave" id="leave" hidden></div>
 <aside class="chat" id="chat" hidden aria-label="help chat">
   <div class="chat-head"><b>help</b>
     <button id="chatNew" tabindex="-1" aria-label="new chat" title="new chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
@@ -641,11 +647,36 @@ function paintTop() {
   $('lname').textContent = S.lesson.title; paintChatCtx();
   ROUNDS.forEach((r, i) => dots.append(h('button', { class: 'dot' + (S.done.has(i) ? ' done' : '') + (i === S.idx && S.phase !== 'end' ? ' now' : ''), 'aria-label': 'level ' + r.lvl, tabindex: '-1', onclick: () => go(i) })));
 }
+const MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+const OPT = MAC ? '⌥' : 'alt';
+
+/* ---------- leaving a level you've typed in asks first ---------- */
+function hasWork() {
+  if (!R || !['typing', 'ready', 'edit'].includes(S.phase)) return false;
+  return R.keys > 0 || !!(R.cm && R.cm.getValue().trim());
+}
+function guardLeave(what, act) {
+  if (!hasWork()) return act();
+  S.leave = act;
+  const box = $('leave'); box.innerHTML = '';
+  box.append(h('div', { class: 'leave-box rise', role: 'dialog', 'aria-modal': 'true' },
+    h('h2', { text: what + '?' }),
+    h('p', { text: "What you've typed on this level will be lost." }),
+    h('div', { class: 'leave-keys' }, h('span', {}, kbd('↵'), ' yes, ' + what), h('span', {}, kbd('esc'), ' keep going'))));
+  box.hidden = false;
+  if (R.cm) R.cm.getInputField().blur();
+}
+function closeLeave(confirmed) {
+  const act = S.leave; S.leave = null; $('leave').hidden = true;
+  if (confirmed) return act();
+  if (S.phase === 'edit' && R && R.cm) R.cm.focus();
+}
+
 function paintKeys() {
   const k = $('keys'); k.innerHTML = '';
   const item = (keys, label) => h('span', {}, ...keys.map(kbd), label);
   const p = S.phase;
-  if (p === 'typing') k.append(item([], 'just start typing'), item(['⌘', '↵'], 'run'), item(['esc'], 'restart'), item(['alt', '→'], 'skip'));
+  if (p === 'typing') k.append(item([], 'just start typing'), item(['⌘', '↵'], 'run'), item(['esc'], 'restart'), item([OPT, '→'], 'skip'));
   if (p === 'ready') k.append(item(['⌘', '↵'], 'run'), item(['esc'], 'restart'));
   if (p === 'edit') k.append(item(['⌘', '↵'], 'run'), item(['esc'], 'restart'));
   if (p === 'result') k.append(item(['↵'], 'next'), item(['esc'], 'redo this level'));
@@ -664,7 +695,13 @@ function paintKeys() {
 }
 function cue(el, keys, label) { el.innerHTML = ''; if (keys) el.append(...keys.map(kbd), label); }
 
-function go(i) { if (!ROUNDS.length) return; S.idx = Math.max(0, Math.min(ROUNDS.length - 1, i)); S.prog.at = { topic: S.lesson.topic, lvl: S.idx + 1 }; save(); startRound(); }
+function go(i) {
+  if (!ROUNDS.length) return;
+  const to = Math.max(0, Math.min(ROUNDS.length - 1, i));
+  if (to === S.idx) return;
+  guardLeave(to < S.idx ? 'go back a level' : 'skip ahead a level', () => goNow(to));
+}
+function goNow(i) { if (!ROUNDS.length) return; S.idx = Math.max(0, Math.min(ROUNDS.length - 1, i)); S.prog.at = { topic: S.lesson.topic, lvl: S.idx + 1 }; save(); startRound(); }
 
 function startRound() {
   const rd = ROUNDS[S.idx];
@@ -1203,9 +1240,15 @@ window.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === '/') { e.preventDefault(); e.stopPropagation(); toggleChat(); return; }
   if (chatEl.contains(e.target)) return;   // typing a question: the game ignores it
   if (CH.open && e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeChat(); return; }   // esc closes help, never restarts the level
+  if (S.leave) {   // the "are you sure" box owns the keyboard until you answer
+    e.preventDefault(); e.stopPropagation();
+    if (e.key === 'Enter' && !e.repeat) closeLeave(true); else if (e.key === 'Escape') closeLeave(false);
+    return;
+  }
   if (QPHASES.has(S.phase)) { quizKey(e); return; }
-  if (e.key === 'Escape') { e.preventDefault(); if (S.phase !== 'end') startRound(); return; }
-  if (e.altKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); go(S.idx + (e.key === 'ArrowRight' ? 1 : -1)); return; }
+  if (e.key === 'Escape') { e.preventDefault(); if (S.phase !== 'end') guardLeave('start this level over', startRound); return; }
+  // In the code editor, ⌥←/⌥→ jump by word (normal Mac editing), so they never change the level there.
+  if (e.altKey && S.phase !== 'edit' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); go(S.idx + (e.key === 'ArrowRight' ? 1 : -1)); return; }
   const enter = e.key === 'Enter', cmdEnter = enter && (e.metaKey || e.ctrlKey);
   // ⌘↵ always runs. Plain ↵ and ⇧↵ are new lines while you type.
   if (S.phase === 'edit') { if (cmdEnter) { e.preventDefault(); run(); } return; }
