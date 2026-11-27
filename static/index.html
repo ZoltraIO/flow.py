@@ -561,15 +561,17 @@ async function teacherNext() {
 }
 
 /* ---------- your goal: the teacher shapes every new lesson around it ---------- */
-function goalScreen(back) {
+function goalScreen(back, first) {
   S.phase = 'goal'; stage.innerHTML = '';
   const input = h('input', { class: 'goal-in', type: 'text', maxlength: '160', spellcheck: 'false', autocomplete: 'off',
                              placeholder: 'build my own tools' });
   input.value = S.prog.profile.reason || '';
-  S.goal = { back, input };
+  S.goal = { back, input, first };
   stage.append(h('div', { class: 'end rise' },
     h('h1', { text: 'what are you learning Python for?' }),
-    h('p', { text: 'Your teacher builds every new lesson around this. Change it any time.' }),
+    h('p', { text: first
+      ? 'One question before you start. Your teacher builds every new lesson around your answer. Change it any time from the home screen.'
+      : 'Your teacher builds every new lesson around this. Change it any time.' }),
     input));
   paintTop(); paintKeys();
   setTimeout(() => { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }, 30);
@@ -654,7 +656,7 @@ function paintKeys() {
   if (p === 'qfeedback') k.append(item(['↵'], 'next'), item(['esc'], "I'm done"));
   if (p === 'placed') k.append(item(['↵'], 'start'), item(['esc'], 'back'));
   if (p === 'welcome') k.append(item(['1'], 'keep going'), item(['2'], 'quiz'), item(['3'], 'my goal'), item(['↑', '↓'], 'choose'), item(['↵'], 'go'), item(['m'], 'model'));
-  if (p === 'goal') k.append(item(['↵'], 'save'), item(['esc'], 'back'));
+  if (p === 'goal') k.append(item(['↵'], S.goal && S.goal.first ? 'start' : 'save'), item(['esc'], S.goal && S.goal.first ? 'skip' : 'back'));
   if (p === 'models') k.append(item(['↑', '↓'], 'choose'), item(['↵'], 'pick'), item(['esc'], 'back'));
   if (p === 'loading') k.append(item(['esc'], 'back'));
   if (p === 'fail') k.append(item(['↵'], 'try again'), item(['m'], 'other model'), item(['esc'], 'back'));
@@ -1012,7 +1014,10 @@ function placed(stopped) {
 }
 function startFromPlacement() {
   const t = (S.placement && S.placement.gap) || firstTopic();
-  if (t) startTopic(t, 1); else teacherNext();
+  const go = () => (t ? startTopic(t, 1) : teacherNext());
+  // The first lesson asks your goal; skipping it in the quiz shouldn't skip the question.
+  if (!S.prog.profile.reason && t !== TOPICS[0]) return goalScreen(go, true);
+  go();
 }
 
 function quizKey(e) {
