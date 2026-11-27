@@ -27,10 +27,19 @@ short, clear, warm, no fluff, no jokes that need explaining. Write at a 5th-grad
 
 A lesson is one topic in exactly four levels:
 - lvl 1: "learn" (the idea, 1-3 short sentences), "task" (one sentence), "code" fully shown (no gaps). Teach the core idea.
-- lvl 2: "learn" (one new detail), "task", "code" with a few [[gaps]] the learner types from memory.
-- lvl 3: no learn. "task" + "code" where most lines are [[gaps]] (hide more than level 2).
+- lvl 2: "learn" (one new detail), "task", "code" with 1-3 small [[gaps]]: a keyword, a method name, or one
+  argument. Most of the code stays visible.
+- lvl 3: no learn. "task" + "code" where whole lines are gaps. Keep the first line visible (usually the line that
+  sets up the data); every other line is one gap from just after its indentation to the end of the line,
+  like    [[print(parts[0])]]
+  If a line ends in ], end the gap before the last bracket part so marks never touch:  [[ip = parts]][0]
+  The learner can't see those lines, so the level 3 task names every variable they make, in order:
+  "Split ip into parts, turn each part into n, and print n."
 - lvl 4: no learn, no code. "task" (exact enough that the output is clear), "hint" (a near-answer for after 2 misses),
   "solution" (working code), "checks" (how the page grades the learner's code; see below). Keep it small: 2-5 lines.
+How much a level hides is counted in characters: hidden characters divided by all the code's characters.
+The recipe above puts level 2 under about a third and level 3 over half, and level 3 must always hide a bigger
+share than level 2.
 Every round also has "say": one short line shown after it runs. It may use %out% (last output line), %name%, %reason%.
 
 Code rules (the page breaks if you ignore these):
@@ -53,6 +62,12 @@ checks (level 4) is a list. Each item has "kind", its field, and "msg" (what to 
 - {"kind": "min_lines", "n": 2, "msg": "..."}
 - {"kind": "code_has", "re": "python regex the code must match", "msg": "..."}
 Use out_is when the task fixes the output, plus a code_has so they really use the topic.
+
+Each round object has exactly these keys (every value is a non-empty string except lvl and checks):
+- lvl 1 and 2: "lvl", "learn", "task", "code", "say"
+- lvl 3: "lvl", "task", "code", "say"
+- lvl 4: "lvl", "task", "hint", "solution", "checks", "say"
+Length limits, in characters: "learn" 320, "task" 170, "say" 220. One short sentence fits a task.
 
 Return only the lesson as one JSON object: {"topic": ..., "title": ..., "rounds": [4 objects with "lvl" 1-4]}.
 No markdown, no commentary."""

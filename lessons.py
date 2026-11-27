@@ -306,7 +306,13 @@ def _check_lvl4(r: dict, timeout: float, max_chars: int) -> list[str]:
 
 def _gap_growth_problems(fractions: dict[int, float]) -> list[str]:
     if 2 in fractions and 3 in fractions and fractions[3] <= fractions[2]:
-        return ["level 3 must hide more of the code than level 2"]
+        return [
+            "level 3 must hide more of the code than level 2 "
+            f"(level 2 hides {fractions[2]:.0%} of its characters, "
+            f"level 3 hides {fractions[3]:.0%}). In level 3, keep only the first "
+            "line visible and make every other line one whole-line gap; "
+            "in level 2, hide 1-3 small pieces"
+        ]
     return []
 
 
