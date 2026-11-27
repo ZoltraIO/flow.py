@@ -53,7 +53,8 @@ If a lesson fails, the problems go back to the model so it can fix them.
 | Piece | What it does |
 |---|---|
 | `static/index.html` | The whole game: the typer, the placement quiz, the levels. |
-| `server.py` | Serves the game, runs code, saves progress, hands out lessons, and keeps logs. Listens on 127.0.0.1 only. |
+| `server.py` | Starts the game: saves progress, hands out lessons, and keeps logs. Listens on 127.0.0.1 only. |
+| `routes.py` | Every web address the page talks to, and the guard that only lets this page on this machine in. |
 | `runner.py` | Runs your code in a separate Python process. It has a 5 second limit, no API keys, and an empty temp folder. |
 | `lessons.py` | Holds the lesson format, the topic order, and the checks every lesson must pass. |
 | `lessons/*.json` | Hand-checked lessons for the 11 placement topics. |

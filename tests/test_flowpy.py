@@ -54,8 +54,19 @@ def test_every_shipped_lesson_passes(path):
 
 def test_all_placement_topics_have_lessons():
     shipped = {p.stem for p in (APP / "lessons").glob("*.json")}
-    quiz = ["print", "variables", "strings", "f-strings", "math", "lists", "if / else",
-            "for loops", "dicts", "functions", "comprehensions"]
+    quiz = [
+        "print",
+        "variables",
+        "strings",
+        "f-strings",
+        "math",
+        "lists",
+        "if / else",
+        "for loops",
+        "dicts",
+        "functions",
+        "comprehensions",
+    ]
     assert {lessons.slug(t) for t in quiz} <= shipped
 
 
@@ -65,25 +76,32 @@ def _with_round(lvl, **changes):
     return lesson
 
 
-@pytest.mark.parametrize("lvl,changes,needle", [
-    (3, {"code": "nums = [[[1, 2]]]\nprint(nums)"}, "']]]'"),
-    (2, {"code": 'x = {{your word|hi}}\nprint(x)'}, "inside a quoted string"),
-    (1, {"code": "for n in [[range(3)]]:\n    print(n)"}, "level 1 shows all the code"),
-    (2, {"code": "for n in range(3):\n    print(n)"}, "level 2 needs [[gaps]]"),
-    (3, {"code": "print([[1]] + 1)"}, "hide more of the code than level 2"),
-    (1, {"code": "print(undefined_name)"}, "code fails when run"),
-    (4, {"solution": "print(5)"}, "does not pass its own check"),
-    (3, {"learn": "extra text"}, "no learn text"),
-    (3, {"code": "[[def add(a, b):]]\n    [[return a + b]]\n\nprint(add(2, 3))"}, "hides 'b'"),
-])
+@pytest.mark.parametrize(
+    "lvl,changes,needle",
+    [
+        (3, {"code": "nums = [[[1, 2]]]\nprint(nums)"}, "']]]'"),
+        (2, {"code": "x = {{your word|hi}}\nprint(x)"}, "inside a quoted string"),
+        (1, {"code": "for n in [[range(3)]]:\n    print(n)"}, "level 1 shows all the code"),
+        (2, {"code": "for n in range(3):\n    print(n)"}, "level 2 needs [[gaps]]"),
+        (3, {"code": "print([[1]] + 1)"}, "hide more of the code than level 2"),
+        (1, {"code": "print(undefined_name)"}, "code fails when run"),
+        (4, {"solution": "print(5)"}, "does not pass its own check"),
+        (3, {"learn": "extra text"}, "no learn text"),
+        (3, {"code": "[[def add(a, b):]]\n    [[return a + b]]\n\nprint(add(2, 3))"}, "hides 'b'"),
+    ],
+)
 def test_validate_catches_broken_lessons(lvl, changes, needle):
     problems = lessons.validate(_with_round(lvl, **changes))
     assert any(needle in p for p in problems), problems
 
 
 def test_guessing_rule_allows_what_the_screen_shows():
-    assert lessons.guess_problems("[[def add(a, b):]]\n    return a + b", "Write add.") == []  # a, b visible below
-    assert lessons.guess_problems("nums.[[append]](4)\nprint([[len(nums)]])", "") == []  # methods, builtins
+    assert (
+        lessons.guess_problems("[[def add(a, b):]]\n    return a + b", "Write add.") == []
+    )  # a, b visible below
+    assert (
+        lessons.guess_problems("nums.[[append]](4)\nprint([[len(nums)]])", "") == []
+    )  # methods, builtins
     assert lessons.guess_problems("print(mins [[// 60]])", "") == []  # numbers are worked out
     assert lessons.guess_problems('[[print("nope")]]', "Print nope.") == []
     assert lessons.guess_problems('[[print("nope")]]', "Print a message.") != []
@@ -118,8 +136,9 @@ def test_writer_fixes_a_bad_draft():
     bad = _while_lesson()
     bad["rounds"][0]["code"] = "print(oops)"
     fake = FakeAPI(["```json\n" + json.dumps(bad) + "\n```", json.dumps(_while_lesson())])
-    out = writer_mod.Writer(S, transport=fake).write("while loops", {"reason": "build tools"}, FOR_LOOPS,
-                                                    model="claude-haiku-5-5")
+    out = writer_mod.Writer(S, transport=fake).write(
+        "while loops", {"reason": "build tools"}, FOR_LOOPS, model="claude-haiku-5-5"
+    )
     assert out["topic"] == "while loops" and out["source"]["by"] == "claude-haiku-5-5"
     assert len(fake.calls) == 2
     fix_request = fake.calls[1][2]["messages"][-1]["content"]
@@ -142,8 +161,14 @@ def test_writer_gives_up_after_fix_attempts():
 
 
 def test_writer_model_list_puts_default_first_and_drops_embeddings():
-    fake = FakeAPI([], models=["glm-5.3", "deepseek-v4.1-flash", "claude-haiku-5-5", "text-embedding-3-small"])
-    assert writer_mod.Writer(S, transport=fake).models() == ["deepseek-v4.1-flash", "glm-5.3", "claude-haiku-5-5"]
+    fake = FakeAPI(
+        [], models=["glm-5.3", "deepseek-v4.1-flash", "claude-haiku-5-5", "text-embedding-3-small"]
+    )
+    assert writer_mod.Writer(S, transport=fake).models() == [
+        "deepseek-v4.1-flash",
+        "glm-5.3",
+        "claude-haiku-5-5",
+    ]
 
 
 def test_writer_without_key(monkeypatch):
@@ -221,7 +246,10 @@ def test_server_page_and_health(live):
 
 def test_server_blocks_other_sites(live):
     assert call(live, "POST", "/api/run", {"code": "print(1)"}, {"X-Flowpy": ""})[0] == 403
-    assert call(live, "POST", "/api/run", {"code": "print(1)"}, {"Origin": "https://evil.example"})[0] == 403
+    assert (
+        call(live, "POST", "/api/run", {"code": "print(1)"}, {"Origin": "https://evil.example"})[0]
+        == 403
+    )
     assert call(live, "GET", "/api/health", headers={"Host": "evil.example"})[0] == 403
 
 
@@ -235,7 +263,12 @@ def test_server_saves_progress_and_events(live):
     prog = {"v": 1, "profile": {"name": "Sam"}, "at": {"topic": "math", "lvl": 2}, "xp": 40}
     assert call(live, "PUT", "/api/progress", prog)[0] == 200
     assert call(live, "GET", "/api/progress") == (200, prog)
-    call(live, "POST", "/api/event", {"type": "round", "topic": "math", "lvl": 4, "acc": 90, "fails": 1})
+    call(
+        live,
+        "POST",
+        "/api/event",
+        {"type": "round", "topic": "math", "lvl": 4, "acc": 90, "fails": 1},
+    )
     assert live.app.stats() == {"rounds_done": 1, "avg_accuracy": 90, "avg_level4_misses": 1.0}
 
 
@@ -255,7 +288,11 @@ def test_server_lessons_builtin_written_cached_and_no_key(live):
 
 def test_server_model_choice(live):
     code, body = call(live, "GET", "/api/models")
-    assert code == 200 and body == {"default": S.model, "chosen": S.model, "models": [S.model, "claude-haiku-5-5"]}
+    assert code == 200 and body == {
+        "default": S.model,
+        "chosen": S.model,
+        "models": [S.model, "claude-haiku-5-5"],
+    }
     call(live, "PUT", "/api/progress", {"v": 1, "model": "claude-haiku-5-5"})
     assert call(live, "GET", "/api/health")[1]["writer"]["model"] == "claude-haiku-5-5"
     call(live, "GET", "/api/lesson?topic=classes")
@@ -263,39 +300,83 @@ def test_server_model_choice(live):
 
 
 def test_server_log_endpoint_keeps_page_errors(live):
-    call(live, "POST", "/api/log", {"level": "error", "msg": "page broke", "extra": {"where": "test"}})
+    call(
+        live,
+        "POST",
+        "/api/log",
+        {"level": "error", "msg": "page broke", "extra": {"where": "test"}},
+    )
     code, body = call(live, "GET", "/api/logs?level=error&n=5")
-    assert code == 200 and any(r["msg"] == "page broke" and r["src"] == "page" for r in body["rows"])
+    assert code == 200 and any(
+        r["msg"] == "page broke" and r["src"] == "page" for r in body["rows"]
+    )
 
 
 # ---------- teacher ----------
 def _pick(title, kind="new", notes="likes tools"):
-    return json.dumps({"notes": notes, "next": {"title": title, "covers": "reading csv text",
-                                                "why": "You want to build tools, and tools read data.", "kind": kind}})
+    return json.dumps(
+        {
+            "notes": notes,
+            "next": {
+                "title": title,
+                "covers": "reading csv text",
+                "why": "You want to build tools, and tools read data.",
+                "kind": kind,
+            },
+        }
+    )
+
+
+def _first_pick(live) -> dict:
+    """Seed the learner, let the teacher reject one pick, return the accepted entry."""
+    call(live, "PUT", "/api/progress", {"v": 1, "profile": {"reason": "automate my spreadsheets"}})
+    call(
+        live,
+        "POST",
+        "/api/event",
+        {"type": "round", "topic": "dicts", "lvl": 4, "acc": 88, "fails": 3, "secs": 60},
+    )
+    live.writer.teacher_replies = ["oops", _pick("dicts"), _pick("csv basics")]
+    code, body = call(live, "POST", "/api/teacher/next", {})
+    assert code == 200
+    return body["entry"]
 
 
 def test_teacher_picks_remembers_and_feeds_the_writer(live):
-    call(live, "PUT", "/api/progress", {"v": 1, "profile": {"reason": "automate my spreadsheets"}})
-    call(live, "POST", "/api/event", {"type": "round", "topic": "dicts", "lvl": 4, "acc": 88, "fails": 3, "secs": 60})
-    live.writer.teacher_replies = ["oops", _pick("dicts"), _pick("csv basics")]
-    code, body = call(live, "POST", "/api/teacher/next", {})
-    assert code == 200 and body["entry"]["id"] == "t1-csv-basics" and body["entry"]["title"] == "csv basics"
+    entry = _first_pick(live)
+    assert entry["id"] == "t1-csv-basics" and entry["title"] == "csv basics"
     brief = live.writer.chats[0]
     assert "automate my spreadsheets" in brief and '"l4_misses": 3' in brief
-    assert "already on the path" in live.writer.chats[2]     # "dicts" was rejected, then fixed
-    # not played yet: asking again hands back the same pick, no new model call
-    assert call(live, "POST", "/api/teacher/next", {})[1]["entry"]["id"] == "t1-csv-basics"
-    assert len(live.writer.chats) == 3
+    assert "already on the path" in live.writer.chats[2]  # "dicts" was rejected, then fixed
     st = call(live, "GET", "/api/teacher")[1]
     assert st["notes"] == "likes tools" and [e["id"] for e in st["path"]] == ["t1-csv-basics"]
     assert call(live, "GET", "/api/curriculum")[1]["extra"][0]["topic"] == "t1-csv-basics"
     code, body = call(live, "GET", "/api/lesson?topic=t1-csv-basics")
     assert code == 200 and live.writer.calls == ["t1-csv-basics"]
-    # once played, the teacher picks again, and never two reviews in a row
-    call(live, "POST", "/api/event", {"type": "round", "topic": "t1-csv-basics", "lvl": 1, "acc": 95})
-    live.writer.teacher_replies = [_pick("csv again", "review"), _pick("csv more", "review"), _pick("json files")]
+
+
+def test_teacher_hands_back_a_pick_that_was_never_played(live):
+    _first_pick(live)
+    # not played yet: asking again hands back the same pick, no new model call
+    assert call(live, "POST", "/api/teacher/next", {})[1]["entry"]["id"] == "t1-csv-basics"
+    assert len(live.writer.chats) == 3
+
+
+def test_teacher_never_picks_two_reviews_in_a_row(live):
+    _first_pick(live)
+    # once played, the teacher picks again
+    call(
+        live, "POST", "/api/event", {"type": "round", "topic": "t1-csv-basics", "lvl": 1, "acc": 95}
+    )
+    live.writer.teacher_replies = [
+        _pick("csv again", "review"),
+        _pick("csv more", "review"),
+        _pick("json files"),
+    ]
     assert call(live, "POST", "/api/teacher/next", {})[1]["entry"]["kind"] == "review"
-    call(live, "POST", "/api/event", {"type": "round", "topic": "t2-csv-again", "lvl": 1, "acc": 95})
+    call(
+        live, "POST", "/api/event", {"type": "round", "topic": "t2-csv-again", "lvl": 1, "acc": 95}
+    )
     assert call(live, "POST", "/api/teacher/next", {})[1]["entry"]["id"] == "t3-json-files"
 
 
@@ -309,45 +390,94 @@ def test_cached_lesson_that_breaks_new_rules_is_rewritten(live):
 
 def test_chat_sees_the_screen_and_saves_the_talk(live):
     live.writer.teacher_replies.append("Split each row with .split(), then add int(parts[1]).")
-    ctx = {"lesson": "split lines into fields", "level": 3, "task": "Add up the numbers.",
-           "answer": 'rows = ["tea 2"]\ntotal = 0\nprint(total)', "typed": "rows = [\"tea 2\"]\n_____",
-           "last_run": {"ok": False, "err": "NameError: name 'totl' is not defined"}, "misses": 2}
+    ctx = {
+        "lesson": "split lines into fields",
+        "level": 3,
+        "task": "Add up the numbers.",
+        "answer": 'rows = ["tea 2"]\ntotal = 0\nprint(total)',
+        "typed": 'rows = ["tea 2"]\n_____',
+        "last_run": {"ok": False, "err": "NameError: name 'totl' is not defined"},
+        "misses": 2,
+    }
     msgs = [{"role": "user", "content": "im dying over here bro"}]
     code, body = call(live, "POST", "/api/chat", {"messages": msgs, "context": ctx, "chat": "c1"})
     assert code == 200 and body["reply"].startswith("Split each row")
     system = live.writer.systems[-1]
-    for needle in ("split lines into fields", "level 3", "total = 0", "_____", "totl", "Failed runs on this level so far: 2"):
+    for needle in (
+        "split lines into fields",
+        "level 3",
+        "total = 0",
+        "_____",
+        "totl",
+        "Failed runs on this level so far: 2",
+    ):
         assert needle in system, needle
     row = json.loads((live.app.s.data_dir / "chats.jsonl").read_text().splitlines()[-1])
-    assert row["q"] == "im dying over here bro" and row["lesson"] == "split lines into fields" and row["chat"] == "c1"
+    assert (
+        row["q"] == "im dying over here bro"
+        and row["lesson"] == "split lines into fields"
+        and row["chat"] == "c1"
+    )
 
 
 def test_chat_rejects_bad_messages_and_handles_menus(live):
     assert call(live, "POST", "/api/chat", {"messages": []})[0] == 400
-    assert call(live, "POST", "/api/chat", {"messages": [{"role": "system", "content": "x"}]})[0] == 400
-    assert call(live, "POST", "/api/chat", {"messages": [{"role": "assistant", "content": "hi"}]})[0] == 400
+    assert (
+        call(live, "POST", "/api/chat", {"messages": [{"role": "system", "content": "x"}]})[0]
+        == 400
+    )
+    assert (
+        call(live, "POST", "/api/chat", {"messages": [{"role": "assistant", "content": "hi"}]})[0]
+        == 400
+    )
     live.writer.teacher_replies.append("A list holds many things in order.")
-    code, _ = call(live, "POST", "/api/chat", {"messages": [{"role": "user", "content": "what is a list"}],
-                                                "context": {"screen": "the home screen"}})
+    code, _ = call(
+        live,
+        "POST",
+        "/api/chat",
+        {
+            "messages": [{"role": "user", "content": "what is a list"}],
+            "context": {"screen": "the home screen"},
+        },
+    )
     assert code == 200 and "the home screen, not inside a lesson" in live.writer.systems[-1]
 
 
 def test_chat_without_key_says_so(live):
     def no_key(model, system, messages):
         raise writer_mod.WriterUnavailable("No key")
+
     live.writer.chat = no_key
-    code, body = call(live, "POST", "/api/chat", {"messages": [{"role": "user", "content": "help"}]})
+    code, body = call(
+        live, "POST", "/api/chat", {"messages": [{"role": "user", "content": "help"}]}
+    )
     assert code == 503 and body["error"] == "no_key"
 
 
 def test_chat_sees_the_placement_quiz(live):
     live.writer.teacher_replies.append("Your loop adds 1 before it prints.")
-    ctx = {"quiz": True, "topic": "for loops", "number": "9 of 12", "kind": "write code",
-           "question": "Write a loop that prints 1, 2 and 3, each on its own line.",
-           "typed": "n = 0\nfor n in range(1, 4):\n    n += 1\n    print(n)",
-           "last_run": {"ok": False, "output": "2\n3\n4", "error": ""}}
-    code, _ = call(live, "POST", "/api/chat", {"messages": [{"role": "user", "content": "why not 1 2 3"}], "context": ctx})
+    ctx = {
+        "quiz": True,
+        "topic": "for loops",
+        "number": "9 of 12",
+        "kind": "write code",
+        "question": "Write a loop that prints 1, 2 and 3, each on its own line.",
+        "typed": "n = 0\nfor n in range(1, 4):\n    n += 1\n    print(n)",
+        "last_run": {"ok": False, "output": "2\n3\n4", "error": ""},
+    }
+    code, _ = call(
+        live,
+        "POST",
+        "/api/chat",
+        {"messages": [{"role": "user", "content": "why not 1 2 3"}], "context": ctx},
+    )
     system = live.writer.systems[-1]
     assert code == 200
-    for needle in ("placement quiz, question 9 of 12", "prints 1, 2 and 3", "n += 1", "2\\n3\\n4", "don't write the passing answer"):
+    for needle in (
+        "placement quiz, question 9 of 12",
+        "prints 1, 2 and 3",
+        "n += 1",
+        "2\\n3\\n4",
+        "don't write the passing answer",
+    ):
         assert needle in system, needle

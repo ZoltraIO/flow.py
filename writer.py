@@ -16,9 +16,8 @@ import urllib.error
 import urllib.request
 import uuid
 
-import settings as settings_mod
-
 import lessons
+import settings as settings_mod
 
 log = logging.getLogger("flowpy.writer")
 
@@ -72,6 +71,7 @@ def api_key(var: str) -> str:
     value = ""
     try:
         from dotenv import dotenv_values
+
         value = dotenv_values(settings_mod.ENV_PATH).get(var) or ""
     except ImportError:
         pass
@@ -85,13 +85,17 @@ def _extract_json(text: str) -> dict:
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end < start:
         raise ValueError("no JSON object in the reply")
-    return json.loads(text[start:end + 1])
+    return json.loads(text[start : end + 1])
 
 
 def plan_for(topic: str) -> dict:
     """What a core topic covers and what came before it."""
     idx = lessons.TOPICS.index(topic)
-    return {"title": topic, "covers": lessons.CURRICULUM[idx]["covers"], "before": lessons.TOPICS[:idx]}
+    return {
+        "title": topic,
+        "covers": lessons.CURRICULUM[idx]["covers"],
+        "before": lessons.TOPICS[:idx],
+    }
 
 
 def _brief(topic: str, profile: dict, example: dict | None, plan: dict | None = None) -> str:
@@ -107,9 +111,14 @@ def _brief(topic: str, profile: dict, example: dict | None, plan: dict | None = 
         lines.append(f"Their goal: {profile['reason']!r}. Pick examples that serve that goal.")
     stats = profile.get("stats") or {}
     if stats:
-        lines.append(f"How they are doing so far: {json.dumps(stats)}. Pitch the difficulty to that.")
+        lines.append(
+            f"How they are doing so far: {json.dumps(stats)}. Pitch the difficulty to that."
+        )
     if example:
-        lines.append("Here is a finished lesson in the exact format, for a different topic:\n" + json.dumps(example))
+        lines.append(
+            "Here is a finished lesson in the exact format, for a different topic:\n"
+            + json.dumps(example)
+        )
     return "\n\n".join(lines)
 
 
@@ -119,7 +128,7 @@ class Writer:
     def __init__(self, settings, transport=None):
         self.s = settings
         self._transport = transport
-        self._session = str(uuid.uuid4())   # OpenCode Go wants one x-opencode-session per client
+        self._session = str(uuid.uuid4())  # OpenCode Go wants one x-opencode-session per client
         self._models: tuple[float, list[str]] | None = None
         self._models_lock = threading.Lock()
 
@@ -131,12 +140,20 @@ class Writer:
             return self._transport(method, path, body)
         key = api_key(self.s.api_key_var)
         if not key:
-            raise WriterUnavailable(f"No {self.s.api_key_var} in .env, so the lesson writer is off.")
+            raise WriterUnavailable(
+                f"No {self.s.api_key_var} in .env, so the lesson writer is off."
+            )
         req = urllib.request.Request(
-            self.s.base_url.rstrip("/") + path, method=method,
+            self.s.base_url.rstrip("/") + path,
+            method=method,
             data=None if body is None else json.dumps(body).encode(),
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
-                     "User-Agent": "flowpy/1.0", "x-opencode-session": self._session})
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+                "User-Agent": "flowpy/1.0",
+                "x-opencode-session": self._session,
+            },
+        )
         try:
             with urllib.request.urlopen(req, timeout=self.s.request_timeout) as r:
                 return json.loads(r.read())
@@ -162,9 +179,15 @@ class Writer:
             return ids
 
     def chat(self, model: str, system: str, messages: list[dict]) -> str:
-        resp = self._call("POST", "/chat/completions", {
-            "model": model, "max_tokens": self.s.max_tokens,
-            "messages": [{"role": "system", "content": system}, *messages]})
+        resp = self._call(
+            "POST",
+            "/chat/completions",
+            {
+                "model": model,
+                "max_tokens": self.s.max_tokens,
+                "messages": [{"role": "system", "content": system}, *messages],
+            },
+        )
         choice = (resp.get("choices") or [{}])[0]
         if choice.get("finish_reason") == "length":
             raise WriterFailed("The lesson came back cut off.")
@@ -176,8 +199,14 @@ class Writer:
     def _ask(self, model: str, messages: list[dict]) -> str:
         return self.chat(model, SYSTEM, messages)
 
-    def write(self, topic: str, profile: dict, example: dict | None, model: str | None = None,
-              plan: dict | None = None) -> dict:
+    def write(
+        self,
+        topic: str,
+        profile: dict,
+        example: dict | None,
+        model: str | None = None,
+        plan: dict | None = None,
+    ) -> dict:
         model = model or self.s.model
         messages = [{"role": "user", "content": _brief(topic, profile, example, plan)}]
         problems: list[str] = []
@@ -189,15 +218,27 @@ class Writer:
                 problems = lessons.validate(lesson, self.s.run_timeout, self.s.max_output_chars)
             except (ValueError, json.JSONDecodeError) as exc:
                 lesson, problems = None, [f"reply was not valid JSON: {exc}"]
-            log.info("lesson draft", extra={"data": {"topic": topic, "model": model, "attempt": attempt + 1,
-                                                       "secs": round(time.monotonic() - t0, 1),
-                                                       "problems": problems}})
+            log.info(
+                "lesson draft",
+                extra={
+                    "data": {
+                        "topic": topic,
+                        "model": model,
+                        "attempt": attempt + 1,
+                        "secs": round(time.monotonic() - t0, 1),
+                        "problems": problems,
+                    }
+                },
+            )
             if lesson is not None and not problems:
                 lesson["topic"], lesson["source"] = topic, {"by": model, "at": int(time.time())}
                 return lesson
             messages += [
                 {"role": "assistant", "content": text},
-                {"role": "user", "content": "That lesson fails these checks. Fix every one and return the whole lesson again:\n- "
-                                            + "\n- ".join(problems)},
+                {
+                    "role": "user",
+                    "content": "That lesson fails these checks. Fix every one and return the whole lesson again:\n- "
+                    + "\n- ".join(problems),
+                },
             ]
         raise WriterFailed("The lesson did not pass its checks: " + "; ".join(problems[:5]))

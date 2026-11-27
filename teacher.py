@@ -44,7 +44,51 @@ Return only one JSON object:
 
 
 def _plain(text, limit: int) -> bool:
-    return isinstance(text, str) and 0 < len(text.strip()) <= limit and text.isascii() and "\n" not in text
+    return (
+        isinstance(text, str)
+        and 0 < len(text.strip()) <= limit
+        and text.isascii()
+        and "\n" not in text
+    )
+
+
+def _title_problem(nxt: dict, st: dict) -> str:
+    title = nxt.get("title")
+    if not _plain(title, MAX_TITLE) or not re.search(r"[a-z]", str(title or "").lower()):
+        return f"title must be plain text, at most {MAX_TITLE} characters"
+    taken = {e["title"] for e in st["path"]} | set(lessons.TOPICS)
+    if str(title).strip().lower() in taken:
+        return "that title is already on the path; pick something new"
+    return ""
+
+
+def _covers_problem(nxt: dict) -> str:
+    if not _plain(nxt.get("covers"), MAX_COVERS):
+        return f"covers must be one plain line, at most {MAX_COVERS} characters"
+    return ""
+
+
+def _why_problem(nxt: dict) -> str:
+    if not _plain(nxt.get("why"), MAX_WHY):
+        return f"why must be one plain sentence, at most {MAX_WHY} characters"
+    return ""
+
+
+def _kind_problem(nxt: dict) -> str:
+    if nxt.get("kind") not in ("new", "review"):
+        return 'kind must be "new" or "review"'
+    return ""
+
+
+def _review_problem(nxt: dict, st: dict) -> str:
+    path = st["path"]
+    if nxt.get("kind") == "review" and path and path[-1]["kind"] == "review":
+        return "never two reviews in a row; pick a new lesson"
+    return ""
+
+
+def _notes_problem(notes) -> str:
+    return "" if isinstance(notes, str) else "notes must be a string"
 
 
 class Teacher:
@@ -76,23 +120,36 @@ class Teacher:
         if topic_id not in ids:
             return None
         e = st["path"][ids.index(topic_id)]
-        before = lessons.TOPICS + [x["title"] for x in st["path"][:ids.index(topic_id)]]
+        before = lessons.TOPICS + [x["title"] for x in st["path"][: ids.index(topic_id)]]
         return {"title": e["title"], "covers": e["covers"], "why": e["why"], "before": before}
 
     # ---- picking the next lesson ---------------------------------------
     def _brief(self, goal: str, topic_stats: dict, st: dict) -> str:
-        path = [{"title": e["title"], "kind": e["kind"], "how_it_went": topic_stats.get(e["id"], "not played yet")}
-                for e in st["path"]]
-        core = {t: topic_stats.get(t, "skipped (knew it from the placement quiz)") for t in lessons.TOPICS}
-        return "\n\n".join([
-            f"The learner's goal: {goal!r}." if goal else
-            "The learner has not said a goal yet. Pick broadly useful skills for writing small scripts and tools.",
-            "Your notes so far: " + (st["notes"] or "(none yet, this is your first pick)"),
-            "Core path results per topic (acc = typing accuracy %, l4_misses = wrong runs on level 4):\n"
-            + json.dumps(core),
-            "Lessons you picked so far, in order:\n" + (json.dumps(path) if path else "(none yet)"),
-            "Pick the next lesson.",
-        ])
+        path = [
+            {
+                "title": e["title"],
+                "kind": e["kind"],
+                "how_it_went": topic_stats.get(e["id"], "not played yet"),
+            }
+            for e in st["path"]
+        ]
+        core = {
+            t: topic_stats.get(t, "skipped (knew it from the placement quiz)")
+            for t in lessons.TOPICS
+        }
+        return "\n\n".join(
+            [
+                f"The learner's goal: {goal!r}."
+                if goal
+                else "The learner has not said a goal yet. Pick broadly useful skills for writing small scripts and tools.",
+                "Your notes so far: " + (st["notes"] or "(none yet, this is your first pick)"),
+                "Core path results per topic (acc = typing accuracy %, l4_misses = wrong runs on level 4):\n"
+                + json.dumps(core),
+                "Lessons you picked so far, in order:\n"
+                + (json.dumps(path) if path else "(none yet)"),
+                "Pick the next lesson.",
+            ]
+        )
 
     def next(self, goal: str, topic_stats: dict, model: str) -> dict:
         """The next lesson on the path. If the last pick was never played, hand that one back."""
@@ -112,14 +169,25 @@ class Teacher:
                     problem = f"reply was not valid JSON: {exc}"
                 if not problem:
                     break
-                messages += [{"role": "assistant", "content": text},
-                             {"role": "user", "content": f"That reply has a problem: {problem}. Send the whole JSON again."}]
+                messages += [
+                    {"role": "assistant", "content": text},
+                    {
+                        "role": "user",
+                        "content": f"That reply has a problem: {problem}. Send the whole JSON again.",
+                    },
+                ]
             if problem:
                 raise WriterFailed("The teacher's pick did not pass its checks: " + problem)
             title = nxt["title"].strip().lower()
-            entry = {"id": f"t{len(st['path']) + 1}-{lessons.slug(title)}", "title": title,
-                     "covers": nxt["covers"].strip(), "why": nxt["why"].strip(), "kind": nxt["kind"],
-                     "by": model, "at": int(time.time())}
+            entry = {
+                "id": f"t{len(st['path']) + 1}-{lessons.slug(title)}",
+                "title": title,
+                "covers": nxt["covers"].strip(),
+                "why": nxt["why"].strip(),
+                "kind": nxt["kind"],
+                "by": model,
+                "at": int(time.time()),
+            }
             st["path"].append(entry)
             st["notes"] = str(notes).strip()[:MAX_NOTES]
             self._write(st)
@@ -130,18 +198,12 @@ class Teacher:
     def _problem(nxt: dict, notes, st: dict) -> str:
         if not isinstance(nxt, dict):
             return '"next" must be an object'
-        if not _plain(nxt.get("title"), MAX_TITLE) or not re.search(r"[a-z]", str(nxt.get("title", "")).lower()):
-            return f"title must be plain text, at most {MAX_TITLE} characters"
-        if nxt["title"].strip().lower() in {e["title"] for e in st["path"]} | set(lessons.TOPICS):
-            return "that title is already on the path; pick something new"
-        if not _plain(nxt.get("covers"), MAX_COVERS):
-            return f"covers must be one plain line, at most {MAX_COVERS} characters"
-        if not _plain(nxt.get("why"), MAX_WHY):
-            return f"why must be one plain sentence, at most {MAX_WHY} characters"
-        if nxt.get("kind") not in ("new", "review"):
-            return 'kind must be "new" or "review"'
-        if nxt["kind"] == "review" and st["path"] and st["path"][-1]["kind"] == "review":
-            return "never two reviews in a row; pick a new lesson"
-        if not isinstance(notes, str):
-            return "notes must be a string"
-        return ""
+        problems = [
+            _title_problem(nxt, st),
+            _covers_problem(nxt),
+            _why_problem(nxt),
+            _kind_problem(nxt),
+            _review_problem(nxt, st),
+            _notes_problem(notes),
+        ]
+        return next((p for p in problems if p), "")
